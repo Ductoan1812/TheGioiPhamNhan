@@ -1,0 +1,83 @@
+{
+  "items": [
+    {
+      "id": "wp_phi_kiem_truc_co",
+      "name": "Phi Kiếm Trúc Cơ",
+      "category": "weapon",
+      "rarity": "huyen",
+      "element": "kim",
+      "realmRequirement": "truc_co",
+      "bindType": "on_equip",
+      "level": 12,
+      "stackSize": 1,
+      "maxStack": 1,
+      "baseStats": {
+        "atk": 38,
+        "defense": 0,
+        "hp": 0,
+        "qi": 0,
+        "moveSpd": 0,
+        "critRate": 0.05,
+        "critDmg": 0,
+        "penetration": 8,
+        "lifestealQi": 0,
+        "res": { "kim": 0, "moc": 0, "thuy": 0, "hoa": 0, "tho": 0, "loi": 0, "am": 0, "duong": 0 }
+      },
+      "sockets": 1,
+      "affixes": [
+        { "id": "prefix_loi_dinh", "value": 12, "tier": 3 },
+        { "id": "suf_truc_co", "value": 6, "tier": 2 }
+      ],
+      "useEffect": null,
+      "flavor": "Kiếm nhẹ, dễ tế luyện.",
+      "addressIcon": "Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_1.png",
+      "addressTexture": "Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_1.png"
+    },
+    {
+      "id": "cs_dan_truc_co",
+      "name": "Đan Trúc Cơ",
+      "category": "consumable",
+      "rarity": "dia",
+      "element": "none",
+      "realmRequirement": "luyen_khi",
+      "bindType": "none",
+      "level": 1,
+      "stackSize": 1,
+      "maxStack": 20,
+      "baseStats": {
+        "atk": 0, "defense": 0, "hp": 0, "qi": 0,
+        "moveSpd": 0, "critRate": 0, "critDmg": 0, "penetration": 0, "lifestealQi": 0,
+        "res": { "kim": 0, "moc": 0, "thuy": 0, "hoa": 0, "tho": 0, "loi": 0, "am": 0, "duong": 0 }
+      },
+      "sockets": 0,
+      "affixes": [],
+      "useEffect": { "type": "restore_qi", "magnitude": 120, "duration": 0, "spellId": "" },
+      "flavor": "Trợ giúp đột phá Trúc Cơ.",
+      "addressIcon": "Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_2.png",
+      "addressTexture": "Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_2.png"
+    },
+    {
+      "id": "cur_linh_thach_trung",
+      "name": "Linh Thạch (Trung phẩm)",
+      "category": "currency",
+      "rarity": "hoang",
+      "element": "none",
+      "realmRequirement": "none",
+      "bindType": "none",
+      "level": 1,
+      "stackSize": 1,
+      "maxStack": 999,
+      "baseStats": {
+        "atk": 0, "defense": 0, "hp": 0, "qi": 0,
+        "moveSpd": 0, "critRate": 0, "critDmg": 0, "penetration": 0, "lifestealQi": 0,
+        "res": { "kim": 0, "moc": 0, "thuy": 0, "hoa": 0, "tho": 0, "loi": 0, "am": 0, "duong": 0 }
+      },
+      "sockets": 0,
+      "affixes": [],
+      "useEffect": null,
+      "flavor": "",
+      "addressIcon": "Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_3.png",
+      "addressTexture": "Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_3.png"
+    }
+  ]
+}

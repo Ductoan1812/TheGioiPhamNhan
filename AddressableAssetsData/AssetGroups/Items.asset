@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Items
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Items
+  m_GUID: 9bbabcfb1bb831e4b9c334914807e9d9
+  m_SerializeEntries:
+  - m_GUID: 3f6f4288bfe7220408c48d8a6719631d
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 440cb4defb0ea7c4598a852a050da698
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6132110ca36332e44ae2e4746bf0620f
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8774881a1de122344b3d27fb390711b9
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c0003e3686c50346942dc833c80d487
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_6.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b0038fe8d0b7b504696d2760e7f7289e
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 5a7bdd191a34eef4eb0e2dc7a036a29e, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: ed2f1e9dbacdda746a696ddc22779d29, type: 2}
+    - {fileID: 11400000, guid: 52ddc25bc8047f645bf3afe2ff544970, type: 2}

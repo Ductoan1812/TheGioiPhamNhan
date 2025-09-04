@@ -1,0 +1,395 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
+[DisallowMultipleComponent]
+public class EquitmentPlayer : MonoBehaviour
+{
+    [Header("Table chứa tất cả EquipmentItemSO")]
+    public EquipmentTableSO equipmentTable;
+    [Header("Renderer theo từng Type (mỗi type có parts riêng)")]
+    public List<TypeGroup> typeGroups = new List<TypeGroup>();
+    [Header("File config JSON")]
+    public TextAsset configJson;
+
+    [System.Serializable]
+    public class Part
+    {
+        public string key; // tên logic: Head, Body, ArmL, ...
+        public SpriteRenderer renderer; // renderer đích
+    }
+
+    [System.Serializable]
+    public class TypeGroup
+    {
+        public string type; // ví dụ: Body, Hair, Armor, Weapon...
+        public List<Part> parts = new List<Part>();
+    }
+
+    [ContextMenu("Apply Config")]
+    public void ApplyConfig()
+    {
+        if (equipmentTable == null || configJson == null) return;
+    var config = JsonUtility.FromJson<PlayerConfig>(configJson.text);
+    if (config == null || config.equippedItems == null) return;
+
+        foreach (var eq in config.equippedItems)
+        {
+            // Resolve renderer bindings for this type once
+            var rb = config.rendererBindings != null ? config.rendererBindings.FirstOrDefault(b => b.type == eq.type) : null;
+
+            // If ItemID is empty or not found, clear all sprites for this type and continue
+            if (string.IsNullOrEmpty(eq.itemID))
+            {
+                if (rb != null && rb.bindings != null)
+                {
+                    foreach (var b in rb.bindings)
+                    {
+                        if (b == null || string.IsNullOrEmpty(b.rendererPath)) continue;
+                        var r = FindRendererByPath(b.rendererPath);
+                        if (r != null) r.sprite = null;
+                    }
+                }
+                continue;
+            }
+
+            var item = equipmentTable.GetByID(eq.itemID);
+            if (item == null || item.texture2D == null)
+            {
+                if (rb != null && rb.bindings != null)
+                {
+                    foreach (var b in rb.bindings)
+                    {
+                        if (b == null || string.IsNullOrEmpty(b.rendererPath)) continue;
+                        var r = FindRendererByPath(b.rendererPath);
+                        if (r != null) r.sprite = null;
+                    }
+                }
+                continue;
+            }
+#if UNITY_EDITOR
+            string texPath = AssetDatabase.GetAssetPath(item.texture2D);
+            var sprites = AssetDatabase.LoadAllAssetsAtPath(texPath).OfType<Sprite>().ToList();
+#else
+            var sprites = new List<Sprite>();
+#endif
+            // Gán sprite theo rendererBindings trong config (không sửa trong Inspector)
+            // First, clear all mapped renderers for this type so missing slices are blank
+            if (rb != null && rb.bindings != null)
+            {
+                foreach (var b in rb.bindings)
+                {
+                    if (b == null || string.IsNullOrEmpty(b.rendererPath)) continue;
+                    var r = FindRendererByPath(b.rendererPath);
+                    if (r != null) r.sprite = null;
+                }
+            }
+            for (int i = 0; i < sprites.Count; i++)
+            {
+                var sprite = sprites[i];
+                string sName = sprite != null ? sprite.name : "";
+                string keyByIndex = $"{sName}|{i}";
+                // Only use paths from config
+                EquitmentPlayer.KeyBinding kb = null;
+                if (rb != null && rb.bindings != null)
+                {
+                    // Prefer key-based mapping when keys are present
+                    kb = rb.bindings.FirstOrDefault(x => !string.IsNullOrEmpty(x.key) && x.key == keyByIndex)
+                         ?? rb.bindings.FirstOrDefault(x => !string.IsNullOrEmpty(x.key) && x.key == sName);
+                    // If no keys provided in JSON, fall back to index-based mapping
+                    if (kb == null && rb.bindings.Count > i && string.IsNullOrEmpty(rb.bindings[i].key))
+                    {
+                        kb = rb.bindings[i];
+                    }
+                }
+                var targetRenderer = (kb != null && !string.IsNullOrEmpty(kb.rendererPath)) ? FindRendererByPath(kb.rendererPath) : null;
+                if (targetRenderer != null) targetRenderer.sprite = sprite;
+            }
+        }
+    }
+
+    public SpriteRenderer FindRendererByPath(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return null;
+        Transform current = transform;
+        string[] parts = path.Split('/');
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var child = current.Find(parts[i]);
+            if (child == null)
+            {
+                // Fallback: if path is a single name, try global search by name
+                if (parts.Length == 1)
+                {
+                    var all = GameObject.FindObjectsByType<SpriteRenderer>(FindObjectsSortMode.None);
+                    return all.FirstOrDefault(r => r != null && r.name == path);
+                }
+                return null;
+            }
+            current = child;
+        }
+        return current.GetComponent<SpriteRenderer>();
+    }
+
+    // no scene-to-config syncing; rendererBindings are edited only in JSON
+
+    // Cấu trúc JSON
+    [System.Serializable]
+    public class PlayerConfig
+    {
+        public List<EquippedItem> equippedItems;
+        public int level;
+        public int hp;
+        public int mana;
+        public string name;
+        public List<RendererBinding> rendererBindings; // lưu mapping renderer theo type và key
+    }
+    [System.Serializable]
+    public class EquippedItem
+    {
+        public string type;
+        public string itemID;
+    }
+
+    [System.Serializable]
+    public class RendererBinding
+    {
+        public string type; // Body, Hair, Armor, Weapon...
+        public List<KeyBinding> bindings = new List<KeyBinding>();
+    }
+
+    [System.Serializable]
+    public class KeyBinding
+    {
+        public string key; // sprite key (name or name|index)
+        public string rendererPath; // relative path under this component
+    }
+}
+
+// (Đã loại bỏ CustomEditor cũ để tránh lỗi biên dịch; dùng Inspector tuỳ chỉnh mới ở dưới)
+#if UNITY_EDITOR
+[CustomEditor(typeof(EquitmentPlayer))]
+public class EquitmentPlayerEditor : Editor
+{
+    // Map config type strings to EquipmentItemSO.EquipmentType names for item filtering only
+    string NormalizeToItemType(string type)
+    {
+        if (string.IsNullOrEmpty(type)) return type;
+        var t = type.Trim().ToLowerInvariant();
+        switch (t)
+        {
+            case "weapon":
+            case "weapon_r":
+            case "weapon_l":
+            case "sword":
+                return "Weapon";
+            case "pant":
+            case "pants":
+            case "foot":
+                return "Foot";
+            case "cloth":
+                return "Cloth";
+            case "cloak":
+                return "Cloak";
+            case "helmet":
+                return "Helmet";
+            case "armor":
+                return "Armor";
+            case "shield":
+                return "Shield";
+            case "amulet":
+                return "Amulet";
+            case "body":
+                return "Body";
+            case "hair":
+                return "Hair";
+            default:
+                return type;
+        }
+    }
+    EquitmentPlayer.RendererBinding GetOrCreateBindingForType(EquitmentPlayer.PlayerConfig config, string type)
+    {
+        if (config.rendererBindings == null) config.rendererBindings = new List<EquitmentPlayer.RendererBinding>();
+        var rb = config.rendererBindings.FirstOrDefault(b => b.type == type);
+        if (rb == null)
+        {
+            rb = new EquitmentPlayer.RendererBinding { type = type, bindings = new List<EquitmentPlayer.KeyBinding>() };
+            config.rendererBindings.Add(rb);
+        }
+        return rb;
+    }
+
+    EquitmentPlayer.KeyBinding GetOrCreateKeyBinding(EquitmentPlayer.RendererBinding rb, string key)
+    {
+        var kb = rb.bindings.FirstOrDefault(x => x.key == key);
+        if (kb == null)
+        {
+            kb = new EquitmentPlayer.KeyBinding { key = key, rendererPath = string.Empty };
+            rb.bindings.Add(kb);
+        }
+        return kb;
+    }
+
+    void SaveConfigToAsset(EquitmentPlayer mgr, EquitmentPlayer.PlayerConfig config)
+    {
+        var json = JsonUtility.ToJson(config, true);
+        var path = AssetDatabase.GetAssetPath(mgr.configJson);
+        if (!string.IsNullOrEmpty(path))
+        {
+            System.IO.File.WriteAllText(path, json);
+            AssetDatabase.ImportAsset(path);
+            EditorUtility.SetDirty(mgr.configJson);
+            GUIUtility.keyboardControl = 0; // commit text fields
+        }
+    }
+
+    public override void OnInspectorGUI()
+    {
+        var mgr = (EquitmentPlayer)target;
+
+        // Draw basic refs
+        EditorGUI.BeginChangeCheck();
+        mgr.equipmentTable = (EquipmentTableSO)EditorGUILayout.ObjectField("Equipment Table", mgr.equipmentTable, typeof(EquipmentTableSO), false);
+        mgr.configJson = (TextAsset)EditorGUILayout.ObjectField("Config JSON", mgr.configJson, typeof(TextAsset), false);
+        if (EditorGUI.EndChangeCheck())
+        {
+            EditorUtility.SetDirty(mgr);
+        }
+
+        if (mgr.equipmentTable == null || mgr.configJson == null)
+        {
+            EditorGUILayout.HelpBox("Chọn EquipmentTableSO và Config JSON để hiển thị.", MessageType.Info);
+            return;
+        }
+
+        // Parse config
+        EquitmentPlayer.PlayerConfig config = null;
+        try
+        {
+            config = JsonUtility.FromJson<EquitmentPlayer.PlayerConfig>(mgr.configJson.text);
+        }
+        catch { }
+        if (config == null)
+        {
+            EditorGUILayout.HelpBox("Config JSON không hợp lệ hoặc rỗng.", MessageType.Warning);
+            return;
+        }
+        if (config.equippedItems == null)
+        {
+            config.equippedItems = new List<EquitmentPlayer.EquippedItem>();
+        }
+
+    // All items from table (we'll filter per-type below)
+    var allItems = mgr.equipmentTable.items ?? new List<EquipmentItemSO>();
+
+    EditorGUILayout.Space(6);
+    EditorGUILayout.LabelField("Equipped Items từ Config", EditorStyles.boldLabel);
+
+        for (int i = 0; i < config.equippedItems.Count; i++)
+        {
+            var eq = config.equippedItems[i];
+            EditorGUILayout.BeginVertical("box");
+            EditorGUILayout.LabelField($"Type: {eq.type}", EditorStyles.miniBoldLabel);
+
+            // Filter items by type alias: Weapon_R/Weapon_L -> Sword, Foot -> Pants, etc.
+            var norm = NormalizeToItemType(eq.type);
+            var filtered = allItems.Where(it => it != null && it.type.ToString().Equals(norm, System.StringComparison.OrdinalIgnoreCase)).ToList();
+            var names = filtered.Select(it => it != null ? $"{it.itemName} ({it.type}) [{it.id}]" : "<null>").ToArray();
+            int curIndex = Mathf.Max(0, filtered.FindIndex(it => it != null && it.id == eq.itemID));
+            int newIndex = EditorGUILayout.Popup("Item", curIndex < 0 ? 0 : curIndex, names);
+            if (newIndex >= 0 && newIndex < filtered.Count && newIndex != curIndex)
+            {
+                var picked = filtered[newIndex];
+                if (picked != null)
+                {
+                    eq.itemID = picked.id;
+                    SaveConfigToAsset(mgr, config);
+                }
+            }
+
+            // ID field (editable)
+            EditorGUI.BeginChangeCheck();
+            string newID = EditorGUILayout.TextField("ItemID", eq.itemID);
+            if (EditorGUI.EndChangeCheck())
+            {
+                eq.itemID = newID;
+                SaveConfigToAsset(mgr, config);
+            }
+
+            // Resolve item and texture
+            EquipmentItemSO item = mgr.equipmentTable.GetByID(eq.itemID);
+            using (new EditorGUI.DisabledScope(true))
+            {
+                EditorGUILayout.ObjectField("Texture2D", item != null ? item.texture2D : null, typeof(Texture2D), false);
+            }
+
+            // Parts: list sprites from texture and map to renderer (per type)
+            if (item != null && item.texture2D != null)
+            {
+                string texPath = AssetDatabase.GetAssetPath(item.texture2D);
+                var sprites = AssetDatabase.LoadAllAssetsAtPath(texPath).OfType<Sprite>().ToList();
+                if (sprites.Count > 0)
+                {
+                    EditorGUILayout.LabelField("Parts (Sprite -> Renderer từ Config - chỉ đọc)", EditorStyles.miniBoldLabel);
+
+                    // handle duplicate sprite names by using unique keys
+                    var nameCounts = sprites.GroupBy(s => s != null ? s.name : "")
+                                            .ToDictionary(g => g.Key, g => g.Count());
+                    for (int si = 0; si < sprites.Count; si++)
+                    {
+                        var s = sprites[si];
+                        string sName = s != null ? s.name : "";
+                        bool isDup = nameCounts.TryGetValue(sName, out int cnt) && cnt > 1;
+                        string keyByIndex = $"{sName}|{si}";
+                        var rb = (config.rendererBindings != null) ? config.rendererBindings.FirstOrDefault(b => b.type == eq.type) : null;
+                        var kb = rb != null ? (rb.bindings.FirstOrDefault(x => x.key == keyByIndex) ?? rb.bindings.FirstOrDefault(x => x.key == sName)) : null;
+                        var resolvedRenderer = (kb != null && !string.IsNullOrEmpty(kb.rendererPath)) ? mgr.FindRendererByPath(kb.rendererPath) : null;
+                        EditorGUILayout.BeginHorizontal();
+                        string display = isDup ? $"{sName} [{si}]" : sName;
+                        EditorGUILayout.LabelField(display, GUILayout.MaxWidth(200));
+                        using (new EditorGUI.DisabledScope(true))
+                        {
+                            EditorGUILayout.ObjectField(resolvedRenderer, typeof(SpriteRenderer), true);
+                        }
+                        EditorGUILayout.EndHorizontal();
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.HelpBox("Texture2D không có sprite con (multi-sprite).", MessageType.Info);
+                }
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("Chưa chọn Item hợp lệ hoặc thiếu Texture2D.", MessageType.None);
+            }
+
+            EditorGUILayout.EndVertical();
+        }
+
+        EditorGUILayout.Space(8);
+        EditorGUILayout.BeginHorizontal();
+    if (GUILayout.Button("Save Config"))
+        {
+            var json = JsonUtility.ToJson(config, true);
+            var path = AssetDatabase.GetAssetPath(mgr.configJson);
+            if (!string.IsNullOrEmpty(path))
+            {
+                System.IO.File.WriteAllText(path, json);
+                AssetDatabase.ImportAsset(path);
+                EditorUtility.SetDirty(mgr.configJson);
+                GUIUtility.keyboardControl = 0; // commit text fields
+            }
+        }
+    if (GUILayout.Button("Apply To Scene"))
+        {
+            mgr.ApplyConfig();
+            EditorUtility.SetDirty(mgr);
+        }
+        EditorGUILayout.EndHorizontal();
+    }
+}
+#endif

@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &1
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6fedc2472449cead18ef23b5cb30d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.2D.Animation.Runtime::UnityEngine.U2D.Animation.SpriteLibrarySourceAsset
+  m_Library:
+  - m_Name: Idle
+    m_Hash: 1008081451
+    m_CategoryList: []
+    m_OverrideEntries:
+    - m_Name: GEM_0
+      m_Hash: 595834095
+      m_Sprite: {fileID: -1811879888, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1811879888, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_1
+      m_Hash: 344228985
+      m_Sprite: {fileID: -815259746, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -815259746, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_2
+      m_Hash: 227399107
+      m_Sprite: {fileID: 1758331455, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1758331455, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_3
+      m_Hash: 982181205
+      m_Sprite: {fileID: -479901949, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -479901949, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_4
+      m_Hash: 619606262
+      m_Sprite: {fileID: 962213398, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 962213398, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_5
+      m_Hash: 334053472
+      m_Sprite: {fileID: 224212588, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 224212588, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_6
+      m_Hash: 182456794
+      m_Sprite: {fileID: -394106840, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -394106840, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_7
+      m_Hash: 1038557516
+      m_Sprite: {fileID: 1393040887, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: 1393040887, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_8
+      m_Hash: 760757469
+      m_Sprite: {fileID: -15495076, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -15495076, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    - m_Name: GEM_9
+      m_Hash: 442436683
+      m_Sprite: {fileID: -1547396307, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+      m_FromMain: 0
+      m_SpriteOverride: {fileID: -1547396307, guid: 41e94075aeee726458ec07935b50edc5, type: 3}
+    m_FromMain: 0
+    m_EntryOverrideCount: 10
+  m_PrimaryLibraryGUID: 
+  m_ModificationHash: 638913875064832700
+  m_Version: 1
