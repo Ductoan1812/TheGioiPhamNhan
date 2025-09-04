@@ -3135,8 +3135,6 @@ MonoBehaviour:
   amountInput: {fileID: 48921907}
   dropSpawn: {fileID: 2017696700}
   spawner: {fileID: 817079053}
-  useAddressablesSeed: 1
-  playerDataAddress: player_data_json
   persistentFileName: PlayerData.json
 --- !u!1 &231653627
 GameObject:
@@ -26842,7 +26840,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
   itemPrefab: {fileID: 2691905775453150574, guid: a9e891c0b48a6044ebc696fef438efb2, type: 3}
-  initialSpawns: []
+  initialSpawns:
+  - itemId: wp_phi_kiem_truc_co
+    quantity: 2
+    position: {x: -40, y: 0, z: 0}
 --- !u!1 &827067716
 GameObject:
   m_ObjectHideFlags: 0

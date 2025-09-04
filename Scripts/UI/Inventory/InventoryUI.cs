@@ -1,154 +1,275 @@
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
+using UnityEngine.UI;
+using Xianxia.Items;
 using Xianxia.PlayerDataSystem;
 
-namespace Xianxia.Persistence
+namespace Xianxia.UI.Inventory
 {
-    public class PlayerDataAddressableStore
+    [DisallowMultipleComponent]
+    public class InventoryUI : MonoBehaviour
     {
-        public string address;
-        public string persistentFileName = "PlayerData.json";
-        public bool writeBackSeedToPersistent = true;
-        public bool prettyPrint = true;
+        [Header("Grid")]
+        [SerializeField] private RectTransform gridParent;
+        [SerializeField] private GameObject slotPrefab;
+        [Tooltip("Nếu PlayerData.Slot là 1-based (1..N), bật cờ này.")]
+        [SerializeField] private bool oneBasedIndex = true;
 
-        public PlayerDataAddressableStore(string address, string persistentFileName = "PlayerData.json")
+        [Header("Controls")]
+        [SerializeField] private Button useButton;
+        [SerializeField] private Button splitButton;
+        [SerializeField] private TMP_InputField amountInput;
+
+        [Header("Drop to World")]
+        [SerializeField] private Transform dropSpawn;
+        [SerializeField] private ItemSpawner spawner;
+
+        [Header("Save file")]
+        [SerializeField] private string persistentFileName = "PlayerData.json";
+
+        private PlayerData _player;
+        private readonly List<SlotPrefab> _slots = new List<SlotPrefab>();
+        private int _selectedSlotIndex = -1;
+
+        private void Start()
         {
-            this.address = address;
-            this.persistentFileName = persistentFileName;
+            if (gridParent == null || slotPrefab == null)
+            {
+                Debug.LogError("InventoryUI: gridParent hoặc slotPrefab chưa gán.");
+                return;
+            }
+
+            // Đọc từ persistent, nếu chưa có thì tạo rỗng
+            _player = PlayerData.LoadOrCreate(PlayerData.GetDefaultPath(persistentFileName));
+            BuildGridSlots(_player.InventorySize);
+            HookButtons();
+            RefreshAll();
         }
 
-        public static string GetPersistentPath(string fileName)
+        private void OnDestroy()
         {
-            return Path.Combine(Application.persistentDataPath, fileName);
+            UnhookButtons();
         }
 
-        public async Task<PlayerData> LoadAsync()
+        private void HookButtons()
         {
-            string path = GetPersistentPath(persistentFileName);
-
-            if (File.Exists(path))
-            {
-                return LoadFromFile(path);
-            }
-
-            if (string.IsNullOrWhiteSpace(address))
-            {
-                Debug.LogWarning("PlayerDataStore: address rỗng, trả về PlayerData rỗng.");
-                return NewEmpty();
-            }
-
-            TextAsset jsonAsset = null;
-            try
-            {
-                var handle = Addressables.LoadAssetAsync<TextAsset>(address);
-                jsonAsset = await handle.Task;
-                Addressables.Release(handle);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"PlayerDataStore: Lỗi load seed từ Addressables '{address}': {e.Message}");
-                return NewEmpty();
-            }
-
-            if (jsonAsset == null || string.IsNullOrEmpty(jsonAsset.text))
-            {
-                Debug.LogWarning($"PlayerDataStore: Seed '{address}' null/empty. Trả về rỗng.");
-                return NewEmpty();
-            }
-
-            var data = Parse(jsonAsset.text);
-            EnsureDefaults(data);
-
-            if (writeBackSeedToPersistent)
-            {
-                SaveToFile(path, data);
-                Debug.Log($"PlayerDataStore: Seed đã ghi về persistent: {path}");
-            }
-
-            return data;
+            if (useButton != null) useButton.onClick.AddListener(OnClickUse);
+            if (splitButton != null) splitButton.onClick.AddListener(OnClickSplit);
         }
 
-        public bool Save(PlayerData data)
+        private void UnhookButtons()
         {
-            if (data == null) { Debug.LogError("PlayerDataStore: Save null data."); return false; }
-            string path = GetPersistentPath(persistentFileName);
-            EnsureDefaults(data);
-            return SaveToFile(path, data);
+            if (useButton != null) useButton.onClick.RemoveListener(OnClickUse);
+            if (splitButton != null) splitButton.onClick.RemoveListener(OnClickSplit);
         }
 
-        // Helpers
-        private static PlayerData LoadFromFile(string path)
+        private void BuildGridSlots(int size)
         {
-            try
+            while (gridParent.childCount > size)
+                Destroy(gridParent.GetChild(gridParent.childCount - 1).gameObject);
+
+            while (gridParent.childCount < size)
             {
-                string json = File.ReadAllText(path);
-                if (string.IsNullOrWhiteSpace(json))
-                {
-                    Debug.LogWarning($"PlayerDataStore: File rỗng: {path}, tạo mới.");
-                    return NewEmpty();
-                }
-                var data = Parse(json);
-                EnsureDefaults(data);
-                return data;
+                var go = Instantiate(slotPrefab, gridParent);
+                go.name = $"Slot_{gridParent.childCount + 1}";
             }
-            catch (Exception e)
+
+            _slots.Clear();
+            for (int i = 0; i < gridParent.childCount; i++)
             {
-                Debug.LogError($"PlayerDataStore: Lỗi đọc file '{path}': {e.Message}");
-                return NewEmpty();
+                var child = gridParent.GetChild(i);
+                var slot = child.GetComponent<SlotPrefab>();
+                if (slot == null) slot = child.gameObject.AddComponent<SlotPrefab>();
+                slot.SetIndex(i);
+                slot.SetOwner(this);
+                slot.SetEmpty();
+                _slots.Add(slot);
             }
         }
 
-        private bool SaveToFile(string path, PlayerData data)
+        public void SavePlayerData()
         {
-            try
-            {
-                var dir = Path.GetDirectoryName(path);
-                if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                    Directory.CreateDirectory(dir);
+            _player?.SaveToFile(PlayerData.GetDefaultPath(persistentFileName));
+        }
 
-                string json = JsonUtility.ToJson(data, prettyPrint);
-                File.WriteAllText(path, json);
-                return true;
-            }
-            catch (Exception e)
+        // ===== API từ SlotPrefab (click) =====
+        public void OnSlotClicked(int slotIndex)
+        {
+            SelectSlot(slotIndex);
+        }
+
+        // ===== Use & Split =====
+        private void OnClickUse()
+        {
+            int idx = _selectedSlotIndex;
+            if (!IsValidSlotIndex(idx)) return;
+
+            var inv = FindInventoryBySlotIndex(idx);
+            if (inv == null) return;
+
+            int amount = ParseAmountOrDefault(1);
+            if (amount <= 0) return;
+
+            amount = Mathf.Min(amount, inv.quantity);
+            inv.quantity -= amount;
+
+            // TODO: áp dụng hiệu ứng tiêu thụ
+            if (inv.quantity <= 0)
             {
-                Debug.LogError($"PlayerDataStore: Lỗi ghi file '{path}': {e.Message}");
+                _player.RemoveSlot(inv.Slot);
+                ClearSelectionIf(idx);
+            }
+
+            SavePlayerData();
+            RefreshAll();
+        }
+
+        private void OnClickSplit()
+        {
+            int idx = _selectedSlotIndex;
+            if (!IsValidSlotIndex(idx)) return;
+
+            var inv = FindInventoryBySlotIndex(idx);
+            if (inv == null || inv.quantity <= 1)
+            {
+                Debug.LogWarning("Split: không thể tách (item không stack hoặc số lượng <= 1).");
+                return;
+            }
+
+            int amount = ParseAmountOrDefault(1);
+            if (amount <= 0 || amount >= inv.quantity)
+            {
+                Debug.LogWarning("Split: số lượng tách phải từ 1 đến (quantity - 1).");
+                return;
+            }
+
+            int empty = FindFirstEmptySlotIndex();
+            if (empty < 0)
+            {
+                Debug.LogWarning("Split: không còn slot trống.");
+                return;
+            }
+
+            var newEntry = new PlayerInventoryItem
+            {
+                id = inv.id,
+                Slot = ToPlayerSlotIndex(empty),
+                quantity = amount,
+                level = inv.level,
+                affixes = inv.affixes
+            };
+            _player.SetSlot(newEntry);
+
+            inv.quantity -= amount;
+            _player.SetSlot(inv);
+
+            SavePlayerData();
+            RefreshAll();
+            SelectSlot(empty);
+        }
+
+        // ===== Helpers =====
+        private int ParseAmountOrDefault(int def)
+        {
+            if (amountInput == null || string.IsNullOrWhiteSpace(amountInput.text))
+                return def;
+            if (int.TryParse(amountInput.text, out var v))
+                return Mathf.Max(0, v);
+            return def;
+        }
+
+        private void SelectSlot(int slotIndex)
+        {
+            if (!IsValidSlotIndex(slotIndex))
+            {
+                _selectedSlotIndex = -1;
+                UpdateSelectionHighlight();
+                return;
+            }
+            _selectedSlotIndex = slotIndex;
+            UpdateSelectionHighlight();
+        }
+
+        private void ClearSelectionIf(int slotIndex)
+        {
+            if (_selectedSlotIndex == slotIndex)
+            {
+                _selectedSlotIndex = -1;
+                UpdateSelectionHighlight();
+            }
+        }
+
+        private void UpdateSelectionHighlight()
+        {
+            for (int i = 0; i < _slots.Count; i++)
+                _slots[i]?.SetSelected(i == _selectedSlotIndex);
+        }
+
+        private bool IsValidSlotIndex(int i) => i >= 0 && i < _slots.Count;
+
+        private PlayerInventoryItem FindInventoryBySlotIndex(int uiIndex)
+        {
+            int playerSlot = ToPlayerSlotIndex(uiIndex);
+            return _player?.GetBySlot(playerSlot);
+        }
+
+        private int ToPlayerSlotIndex(int uiIndex) => oneBasedIndex ? (uiIndex + 1) : uiIndex;
+        private int FromPlayerSlotIndex(int slotField) => oneBasedIndex ? (slotField - 1) : slotField;
+
+        private int FindFirstEmptySlotIndex()
+        {
+            var used = new HashSet<int>();
+            foreach (var it in _player.inventory)
+            {
+                int ui = FromPlayerSlotIndex(it.Slot);
+                if (ui >= 0 && ui < _slots.Count) used.Add(ui);
+            }
+            for (int i = 0; i < _slots.Count; i++)
+                if (!used.Contains(i)) return i;
+            return -1;
+        }
+
+        private void RefreshAll()
+        {
+            if (_player == null) return;
+
+            if (_slots.Count != _player.InventorySize)
+                BuildGridSlots(_player.InventorySize);
+
+            foreach (var s in _slots) s.SetEmpty();
+
+            foreach (var it in _player.inventory)
+            {
+                int uiIndex = FromPlayerSlotIndex(it.Slot);
+                if (!IsValidSlotIndex(uiIndex)) continue;
+
+                var def = ItemDatabaseSO.Instance?.GetById(it.id);
+                _slots[uiIndex].BindItem(it.id, it.quantity, def);
+            }
+
+            UpdateSelectionHighlight();
+        }
+
+        // Không dùng kéo-thả ở bản đơn giản. Nếu cần, sẽ bổ sung lại sau.
+
+        private bool DropToWorld(string itemId, int quantity)
+        {
+            if (spawner == null)
+            {
+                Debug.LogError("InventoryUI: spawner chưa gán.");
                 return false;
             }
-        }
+            Vector3 pos = dropSpawn != null ? dropSpawn.position : Vector3.zero;
+            var go = spawner.Spawn(itemId, quantity, pos);
 
-        private static PlayerData Parse(string json)
-        {
-            try
+            var rb = go != null ? go.GetComponent<Rigidbody2D>() : null;
+            if (rb != null)
             {
-                var data = JsonUtility.FromJson<PlayerData>(json);
-                return data ?? NewEmpty();
+                var dir = UnityEngine.Random.insideUnitCircle.normalized;
+                rb.AddForce(dir * 2.5f, ForceMode2D.Impulse);
             }
-            catch (Exception e)
-            {
-                Debug.LogError($"PlayerDataStore: Parse JSON lỗi: {e.Message}");
-                return NewEmpty();
-            }
-        }
-
-        private static void EnsureDefaults(PlayerData d)
-        {
-            if (d == null) return;
-            d.inventory ??= new List<PlayerInventoryItem>();
-            if (d.InventorySize <= 0) d.InventorySize = 30;
-        }
-
-        private static PlayerData NewEmpty()
-        {
-            return new PlayerData
-            {
-                InventorySize = 30,
-                inventory = new List<PlayerInventoryItem>()
-            };
+            return true;
         }
     }
 }
