@@ -1,0 +1,453 @@
+fileFormatVersion: 2
+guid: 24e896ab9502f1e429b98c1250ee4af2
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 4249538847889340013
+    second: Quatitu_0
+  - first:
+      213: -6791358887604822541
+    second: Quatitu_1
+  - first:
+      213: 1270925654736761306
+    second: Quatitu_2
+  - first:
+      213: 3784604147390961219
+    second: Quatitu_3
+  - first:
+      213: -5605904491582188600
+    second: Quatitu_4
+  - first:
+      213: -650239345067211273
+    second: Quatitu_5
+  - first:
+      213: -6598551145044375126
+    second: Quatitu_6
+  - first:
+      213: 7995372691368223812
+    second: Quatitu_7
+  - first:
+      213: -4697195821787661753
+    second: Quatitu_8
+  - first:
+      213: 8307437264487344336
+    second: Quatitu_9
+  - first:
+      213: -5110840548913544091
+    second: Quatitu_10
+  - first:
+      213: -2470576501942281772
+    second: Quatitu_11
+  - first:
+      213: -5270694824865200228
+    second: Quatitu_12
+  - first:
+      213: -8000464090649505234
+    second: Quatitu_13
+  - first:
+      213: -2839218330747785731
+    second: Quatitu_14
+  - first:
+      213: 965926141440166816
+    second: Quatitu_15
+  - first:
+      213: 2101279164541552677
+    second: Quatitu_16
+  - first:
+      213: 7800032099146507021
+    second: Quatitu_17
+  - first:
+      213: -7835303056531491665
+    second: Quatitu_18
+  - first:
+      213: -3727345174026676792
+    second: Quatitu_19
+  - first:
+      213: 8043792619837109954
+    second: Quatitu_20
+  - first:
+      213: 3692365957769250137
+    second: Quatitu_21
+  - first:
+      213: -1288528575302675559
+    second: Quatitu_22
+  - first:
+      213: -7760660561749966361
+    second: Quatitu_23
+  - first:
+      213: -1300922930979711929
+    second: Quatitu_24
+  - first:
+      213: -8094738813171404370
+    second: Quatitu_25
+  - first:
+      213: 4066277625416515940
+    second: Quatitu_26
+  - first:
+      213: -5441295780873449821
+    second: Quatitu_27
+  - first:
+      213: -7198111659258141203
+    second: Quatitu_28
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Quatitu_0
+      rect:
+        serializedVersion: 2
+        x: 14
+        y: 68
+        width: 35
+        height: 50
+      alignment: 9
+      pivot: {x: 0.5308924, y: 0.0502063}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d66baaf211569fa30800000000000000
+      internalID: 4249538847889340013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_1
+      rect:
+        serializedVersion: 2
+        x: 65
+        y: 67
+        width: 31
+        height: 51
+      alignment: 9
+      pivot: {x: 0.4860483, y: 0.054785635}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3fd5f1ae21f30c1a0800000000000000
+      internalID: -6791358887604822541
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_2
+      rect:
+        serializedVersion: 2
+        x: 111
+        y: 68
+        width: 35
+        height: 47
+      alignment: 9
+      pivot: {x: 0.5123566, y: 0.05370282}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ad1f38a362c33a110800000000000000
+      internalID: 1270925654736761306
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_3
+      rect:
+        serializedVersion: 2
+        x: 161
+        y: 69
+        width: 30
+        height: 46
+      alignment: 9
+      pivot: {x: 0.514416, y: 0.025196573}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 34655bc9b6d958430800000000000000
+      internalID: 3784604147390961219
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_4
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 69
+        width: 29
+        height: 39
+      alignment: 9
+      pivot: {x: 0.5223699, y: 0.03978201}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8c31a76f093d332b0800000000000000
+      internalID: -5605904491582188600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_5
+      rect:
+        serializedVersion: 2
+        x: 255
+        y: 68
+        width: 33
+        height: 41
+      alignment: 9
+      pivot: {x: 0.4934461, y: 0.05168301}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f54942c2c2e9f6f0800000000000000
+      internalID: -650239345067211273
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_6
+      rect:
+        serializedVersion: 2
+        x: 226
+        y: 1
+        width: 69
+        height: 58
+      alignment: 9
+      pivot: {x: 0.4974237, y: 0.44482774}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: aa90267b1bc3d64a0800000000000000
+      internalID: -6598551145044375126
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_7
+      rect:
+        serializedVersion: 2
+        x: 162
+        y: 0
+        width: 61
+        height: 59
+      alignment: 9
+      pivot: {x: 0.5349729, y: 0.52711874}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 444acdbf91545fe60800000000000000
+      internalID: 7995372691368223812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_8
+      rect:
+        serializedVersion: 2
+        x: 78
+        y: 0
+        width: 84
+        height: 63
+      alignment: 9
+      pivot: {x: 0.5, y: 0.46331584}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74ab5e1794530deb0800000000000000
+      internalID: -4697195821787661753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Quatitu_9
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 77
+        height: 63
+      alignment: 9
+      pivot: {x: 0.46305916, y: 0.49717796}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0d86c976d22f94370800000000000000
+      internalID: 8307437264487344336
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 7e41d0b3ed093494ca26fae080cbd350
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      Quatitu_0: 4249538847889340013
+      Quatitu_1: -6791358887604822541
+      Quatitu_10: -5110840548913544091
+      Quatitu_11: -2470576501942281772
+      Quatitu_12: -5270694824865200228
+      Quatitu_13: -8000464090649505234
+      Quatitu_14: -2839218330747785731
+      Quatitu_15: 965926141440166816
+      Quatitu_16: 2101279164541552677
+      Quatitu_17: 7800032099146507021
+      Quatitu_18: -7835303056531491665
+      Quatitu_19: -3727345174026676792
+      Quatitu_2: 1270925654736761306
+      Quatitu_20: 8043792619837109954
+      Quatitu_21: 3692365957769250137
+      Quatitu_22: -1288528575302675559
+      Quatitu_23: -7760660561749966361
+      Quatitu_24: -1300922930979711929
+      Quatitu_25: -8094738813171404370
+      Quatitu_26: 4066277625416515940
+      Quatitu_27: -5441295780873449821
+      Quatitu_28: -7198111659258141203
+      Quatitu_3: 3784604147390961219
+      Quatitu_4: -5605904491582188600
+      Quatitu_5: -650239345067211273
+      Quatitu_6: -6598551145044375126
+      Quatitu_7: 7995372691368223812
+      Quatitu_8: -4697195821787661753
+      Quatitu_9: 8307437264487344336
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

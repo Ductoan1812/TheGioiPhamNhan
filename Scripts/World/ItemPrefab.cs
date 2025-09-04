@@ -13,6 +13,19 @@ public class ItemPrefab : MonoBehaviour
     [SerializeField] private string itemId;
     [SerializeField] private int quantity = 1;
 
+    // Biến thể của item rơi ngoài world
+    [Header("Variant")]
+    [SerializeField] private int level = 0;
+    [SerializeField] private string rarity = "";
+    [SerializeField] private string element = "";
+    [SerializeField, Range(0,100)] private int quality = 0;
+    [SerializeField, Tooltip("0..1 hoặc tuỳ hệ thống")] private float durability = 1f;
+
+    [SerializeField] private ItemStat[] baseStats = System.Array.Empty<ItemStat>();
+    [SerializeField] private PlayerInventoryAffix[] affixes = System.Array.Empty<PlayerInventoryAffix>();
+    [SerializeField] private string[] tags = System.Array.Empty<string>();
+    [SerializeField] private ItemProp[] custom = System.Array.Empty<ItemProp>();
+
     [Header("View")]
     [SerializeField] private SpriteRenderer iconRenderer;
     [SerializeField] private TMP_Text quantityText;
@@ -58,10 +71,25 @@ public class ItemPrefab : MonoBehaviour
     private void OnDisable() => CancelPending();
     private void OnDestroy() => CancelPending();
 
-    public void Setup(string id, int qty)
+    // Setup cho spawner
+    public void Setup(
+        string id, int qty,
+        int level = 0, string rarity = "", string element = "",
+        int quality = 0, float durability = 1f,
+        ItemStat[] baseStats = null, PlayerInventoryAffix[] affixes = null,
+        string[] tags = null, ItemProp[] custom = null)
     {
-        itemId = id;
-        quantity = Mathf.Max(1, qty);
+        this.itemId = id;
+        this.quantity = Mathf.Max(1, qty);
+        this.level = level;
+        this.rarity = rarity;
+        this.element = element;
+        this.quality = Mathf.Clamp(quality, 0, 100);
+        this.durability = durability;
+        this.baseStats = baseStats ?? System.Array.Empty<ItemStat>();
+        this.affixes = affixes ?? System.Array.Empty<PlayerInventoryAffix>();
+        this.tags = tags ?? System.Array.Empty<string>();
+        this.custom = custom ?? System.Array.Empty<ItemProp>();
         _ = ApplyAsync();
     }
 
@@ -81,7 +109,6 @@ public class ItemPrefab : MonoBehaviour
     {
         if (Time.time - _lastPickupTime < pickupCooldown) return;
 
-        // Tìm PlayerStats trên đối tượng hoặc cha (trường hợp collider nằm ở child)
         var stats = go.GetComponentInParent<PlayerStats>();
         if (stats == null) return;
 
@@ -93,9 +120,6 @@ public class ItemPrefab : MonoBehaviour
             _lastPickupTime = Time.time;
     }
 
-    /// <summary>
-    /// Thử nhặt item vào inventory của playerId. Trả về true nếu nhặt được (kể cả 1 phần).
-    /// </summary>
     public bool TryPickup(string playerId)
     {
         if (string.IsNullOrWhiteSpace(itemId) || quantity <= 0) return false;
@@ -107,18 +131,35 @@ public class ItemPrefab : MonoBehaviour
             return false;
         }
 
-        int before = quantity;
-        int leftover = pd.AddItem(itemId, quantity, ItemDatabaseSO.Instance);
-        int picked = before - leftover;
+        // Gửi vào như một instance đầy đủ biến thể
+        var incoming = new PlayerInventoryItem
+        {
+            id = itemId,
+            quantity = quantity,
+            level = level,
+            rarity = rarity,
+            element = element,
+            quality = quality,
+            durability = durability,
+            baseStats = PlayerInventoryItem.CloneBaseStats(baseStats),
+            affixes = PlayerInventoryItem.CloneAffixes(affixes),
+            tags = PlayerInventoryItem.CloneStringArray(tags),
+            custom = PlayerInventoryItem.CloneProps(custom),
+        };
 
+        int before = quantity;
+        int leftover = pd.AddItem(incoming, ItemDatabaseSO.Instance);
+        int picked = before - leftover;
         if (picked <= 0) return false;
 
-        pd.SaveForPlayer();
+        // Gom lại theo khóa biến thể
+        pd.NormalizeStacks(ItemDatabaseSO.Instance);
 
-        if (leftover > 0)
-            SetQuantity(leftover);
-        else
-            Destroy(gameObject);
+        pd.SaveForPlayer(playerId);
+        PlayerData.RaiseInventoryChanged(playerId);
+
+        if (leftover > 0) SetQuantity(leftover);
+        else Destroy(gameObject);
 
         return true;
     }

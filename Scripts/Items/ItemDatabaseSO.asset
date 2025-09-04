@@ -12,4 +12,127 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e43672460f3e75740a424ff323d2bdd6, type: 3}
   m_Name: ItemDatabaseSO
   m_EditorClassIdentifier: Assembly-CSharp::Xianxia.Items.ItemDatabaseSO
-  items: []
+  items:
+  - id: wp_phi_kiem_truc_co
+    name: "Phi Ki\u1EBFm Tr\xFAc C\u01A1"
+    category: 0
+    rarity: 2
+    element: 1
+    realmRequirement: 2
+    bindType: 1
+    level: 12
+    stackSize: 1
+    maxStack: 1
+    baseStats:
+      atk: 38
+      defense: 0
+      hp: 0
+      qi: 0
+      moveSpd: 0
+      critRate: 0.05
+      critDmg: 0
+      penetration: 8
+      lifestealQi: 0
+      res:
+        kim: 0
+        moc: 0
+        thuy: 0
+        hoa: 0
+        tho: 0
+        loi: 0
+        am: 0
+        duong: 0
+    sockets: 1
+    affixes:
+    - id: prefix_loi_dinh
+      value: 12
+      tier: 3
+    - id: suf_truc_co
+      value: 6
+      tier: 2
+    useEffect:
+      type: 
+      magnitude: 0
+      duration: 0
+      spellId: 
+    flavor: "Ki\u1EBFm nh\u1EB9, d\u1EC5 t\u1EBF luy\u1EC7n."
+    addressIcon: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_1.png
+    addressTexture: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_1.png
+  - id: cs_dan_truc_co
+    name: "\u0110an Tr\xFAc C\u01A1"
+    category: 4
+    rarity: 3
+    element: 0
+    realmRequirement: 1
+    bindType: 0
+    level: 1
+    stackSize: 1
+    maxStack: 20
+    baseStats:
+      atk: 0
+      defense: 0
+      hp: 0
+      qi: 0
+      moveSpd: 0
+      critRate: 0
+      critDmg: 0
+      penetration: 0
+      lifestealQi: 0
+      res:
+        kim: 0
+        moc: 0
+        thuy: 0
+        hoa: 0
+        tho: 0
+        loi: 0
+        am: 0
+        duong: 0
+    sockets: 0
+    affixes: []
+    useEffect:
+      type: restore_qi
+      magnitude: 120
+      duration: 0
+      spellId: 
+    flavor: "Tr\u1EE3 gi\xFAp \u0111\u1ED9t ph\xE1 Tr\xFAc C\u01A1."
+    addressIcon: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_2.png
+    addressTexture: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_2.png
+  - id: cur_linh_thach_trung
+    name: "Linh Th\u1EA1ch (Trung ph\u1EA9m)"
+    category: 7
+    rarity: 1
+    element: 0
+    realmRequirement: 0
+    bindType: 0
+    level: 1
+    stackSize: 1
+    maxStack: 100
+    baseStats:
+      atk: 0
+      defense: 0
+      hp: 0
+      qi: 0
+      moveSpd: 0
+      critRate: 0
+      critDmg: 0
+      penetration: 0
+      lifestealQi: 0
+      res:
+        kim: 0
+        moc: 0
+        thuy: 0
+        hoa: 0
+        tho: 0
+        loi: 0
+        am: 0
+        duong: 0
+    sockets: 0
+    affixes: []
+    useEffect:
+      type: 
+      magnitude: 0
+      duration: 0
+      spellId: 
+    flavor: 
+    addressIcon: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_3.png
+    addressTexture: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_3.png

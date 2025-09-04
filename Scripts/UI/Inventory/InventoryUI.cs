@@ -25,12 +25,23 @@ namespace Xianxia.UI.Inventory
         [SerializeField] private Transform dropSpawn;
         [SerializeField] private ItemSpawner spawner;
 
-        [Header("Save file")]
-        [SerializeField] private string persistentFileName = "PlayerData.json";
+        [Header("Player ref")]
+        [SerializeField] private PlayerStats playerStats; // gán trong Inspector, hoặc tự tìm
 
+        private string _playerId = "default";
         private PlayerData _player;
         private readonly List<SlotPrefab> _slots = new List<SlotPrefab>();
         private int _selectedSlotIndex = -1;
+
+        private void OnEnable()
+        {
+            PlayerData.OnInventoryChanged += OnAnyInventoryChanged;
+        }
+
+        private void OnDisable()
+        {
+            PlayerData.OnInventoryChanged -= OnAnyInventoryChanged;
+        }
 
         private void Start()
         {
@@ -40,11 +51,24 @@ namespace Xianxia.UI.Inventory
                 return;
             }
 
-            // Đọc từ persistent, nếu chưa có thì tạo rỗng
-            _player = PlayerData.LoadOrCreate(PlayerData.GetDefaultPath(persistentFileName));
+            if (playerStats == null)
+                playerStats = FindObjectOfType<PlayerStats>();
+
+            _playerId = playerStats != null ? playerStats.PlayerId : "default";
+            _player = PlayerData.GetForPlayer(_playerId, autoCreateIfMissing: true);
+
             BuildGridSlots(_player.InventorySize);
             HookButtons();
             RefreshAll();
+        }
+
+        private void OnAnyInventoryChanged(string changedPlayerId)
+        {
+            if (changedPlayerId != _playerId) return;
+            // Cùng 1 instance trong cache nên chỉ cần refresh view
+            RefreshAll();
+            // Lưu file (nếu bạn muốn auto-save khi có thay đổi)
+            _player.SaveForPlayer(_playerId);
         }
 
         private void OnDestroy()
@@ -90,7 +114,7 @@ namespace Xianxia.UI.Inventory
 
         public void SavePlayerData()
         {
-            _player?.SaveToFile(PlayerData.GetDefaultPath(persistentFileName));
+            _player?.SaveForPlayer(_playerId);
         }
 
         // ===== API từ SlotPrefab (click) =====
@@ -166,7 +190,6 @@ namespace Xianxia.UI.Inventory
 
             SavePlayerData();
             RefreshAll();
-            SelectSlot(empty);
         }
 
         // ===== Helpers =====
@@ -249,27 +272,6 @@ namespace Xianxia.UI.Inventory
             }
 
             UpdateSelectionHighlight();
-        }
-
-        // Không dùng kéo-thả ở bản đơn giản. Nếu cần, sẽ bổ sung lại sau.
-
-        private bool DropToWorld(string itemId, int quantity)
-        {
-            if (spawner == null)
-            {
-                Debug.LogError("InventoryUI: spawner chưa gán.");
-                return false;
-            }
-            Vector3 pos = dropSpawn != null ? dropSpawn.position : Vector3.zero;
-            var go = spawner.Spawn(itemId, quantity, pos);
-
-            var rb = go != null ? go.GetComponent<Rigidbody2D>() : null;
-            if (rb != null)
-            {
-                var dir = UnityEngine.Random.insideUnitCircle.normalized;
-                rb.AddForce(dir * 2.5f, ForceMode2D.Impulse);
-            }
-            return true;
         }
     }
 }

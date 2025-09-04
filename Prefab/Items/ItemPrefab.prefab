@@ -95,7 +95,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -4611891317092368872, guid: 4ffb48fa33dbf2c41bb8d74ec844ff55, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -103,7 +103,7 @@ SpriteRenderer:
   m_Size: {x: 0.1875, y: 0.21875}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!58 &6058407403435519357
@@ -156,9 +156,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemPrefab
   itemId: 
   quantity: 1
+  level: 0
+  rarity: 
+  element: 
+  quality: 0
+  durability: 1
+  baseStats: []
+  affixes: []
+  tags: []
+  custom: []
   iconRenderer: {fileID: 6717156653303577188}
   quantityText: {fileID: 802526463738243193}
   hideQuantityWhenOne: 1
+  pickupOnTrigger: 1
+  onlyPickupByPlayerId: 
+  pickupCooldown: 0.2
 --- !u!1 &2711367944415379984
 GameObject:
   m_ObjectHideFlags: 0
