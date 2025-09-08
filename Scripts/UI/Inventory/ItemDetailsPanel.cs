@@ -60,8 +60,8 @@ public class ItemDetailsPanel : MonoBehaviour
             AppendLine(sb, "Ràng buộc", def.bindType.ToString());
             AppendInt(sb, "Cấp", def.level, inv.level, deltaColor);
             // Stack & số lượng
-            if (def.stackSize > 0 || def.maxStack > 0)
-        AppendLine(sb, "Stack", $"{def.stackSize}/{def.maxStack}");
+            if (def.maxStack > 0)
+                AppendLine(sb, "Stack tối đa", def.maxStack.ToString());
             if (inv.quantity > 0)
         AppendLine(sb, "Số lượng", inv.quantity.ToString());
 

@@ -292,7 +292,6 @@ public class ItemCreator : EditorWindow
             realmRequirement = Realm.none.ToString(),
             bindType = BindType.none.ToString(),
             level = 1,
-            stackSize = 1,
             maxStack = 1,
             baseStats = new BaseStats { res = new Resist() },
             sockets = 0,
@@ -401,9 +400,8 @@ public class ItemCreator : EditorWindow
         bind = (BindType)EditorGUILayout.EnumPopup("Ràng buộc", bind);
         dto.bindType = bind.ToString();
 
-        dto.level = EditorGUILayout.IntField("Cấp", dto.level);
-        dto.stackSize = Mathf.Max(1, EditorGUILayout.IntField("Stack hiện tại", dto.stackSize));
-        dto.maxStack = Mathf.Max(1, EditorGUILayout.IntField("Stack tối đa", dto.maxStack));
+    dto.level = EditorGUILayout.IntField("Cấp", dto.level);
+    dto.maxStack = Mathf.Max(1, EditorGUILayout.IntField("Stack tối đa", dto.maxStack));
 
         EditorGUILayout.Space();
         DrawBaseStats(dto);

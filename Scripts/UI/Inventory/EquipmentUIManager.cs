@@ -142,15 +142,12 @@ public class EquipmentUIManager : MonoBehaviour
     private void HandleDroppedOnEquipSlot(SlotItem source, SlotItem target)
     {
         if (source == null || target == null) return;
-        string slotId = null;
+        string toSlotId = null;
         foreach (var kv in _slotMap)
         {
-            if (kv.Value.slotItem == target) { slotId = kv.Key; break; }
+            if (kv.Value.slotItem == target) { toSlotId = kv.Key; break; }
         }
-        if (string.IsNullOrEmpty(slotId)) return;
-
-        var item = source.CurrentItem;
-        if (item == null || item.quantity <= 0) return;
+        if (string.IsNullOrEmpty(toSlotId)) return;
 
         if (PlayerInventory.Instance == null)
         {
@@ -158,7 +155,25 @@ public class EquipmentUIManager : MonoBehaviour
             return;
         }
 
-        PlayerInventory.Instance.EquipItem(item, slotId);
+        // Check if source is also an equipment slot -> move/swap within equipment
+        string fromSlotId = null;
+        foreach (var kv in _slotMap)
+        {
+            if (kv.Value.slotItem == source) { fromSlotId = kv.Key; break; }
+        }
+
+        if (!string.IsNullOrEmpty(fromSlotId))
+        {
+            // Move between equipment slots without touching inventory
+            PlayerInventory.Instance.MoveEquipment(fromSlotId, toSlotId);
+        }
+        else
+        {
+            var item = source.CurrentItem;
+            if (item == null || item.quantity <= 0) return;
+            // Source is inventory -> Equip (will remove 1 from inventory and handle old item return)
+            PlayerInventory.Instance.EquipItem(item, toSlotId);
+        }
     }
 
     // Double click on an equipment slot to unequip to inventory

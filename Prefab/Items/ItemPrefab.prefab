@@ -163,7 +163,6 @@ MonoBehaviour:
     realmRequirement: 0
     bindType: 0
     level: 1
-    stackSize: 1
     maxStack: 1
     baseStats:
       atk: 0
@@ -197,7 +196,7 @@ MonoBehaviour:
     Slot: 0
     quantity: 0
   quantity: 1
-  lifetimeSeconds: 30
+  lifetimeSeconds: 240
   itemDB: {fileID: 11400000, guid: e1dc69d3eb0c09a45a33bebcfa7218d7, type: 2}
   spriteRenderer: {fileID: 6717156653303577188}
   textMeshPro: {fileID: 802526463738243193}

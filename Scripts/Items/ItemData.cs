@@ -15,9 +15,8 @@ namespace Xianxia.Items
         public Realm realmRequirement = Realm.none;
         public BindType bindType = BindType.none;
 
-        public int level = 1;
-        public int stackSize = 1;
-        public int maxStack = 1;
+    public int level = 1;
+    public int maxStack = 1;
 
         public BaseStats baseStats = new BaseStats();
         public int sockets = 0;
@@ -43,7 +42,6 @@ namespace Xianxia.Items
                 $"Yêu cầu cảnh giới: {realmRequirement}\n" +
                 $"Ràng buộc: {bindType}\n" +
                 $"Cấp: {level}\n" +
-                $"Stack hiện tại: {stackSize}\n" +
                 $"Stack tối đa: {maxStack}\n" +
                 $"Chỉ số gốc: {baseStats}\n" +
                 $"Số socket: {sockets}\n" +
@@ -81,9 +79,8 @@ namespace Xianxia.Items
         public string realmRequirement;
         public string bindType;
 
-        public int level = 1;
-        public int stackSize = 1;
-        public int maxStack = 1;
+    public int level = 1;
+    public int maxStack = 1;
 
         public BaseStats baseStats = new BaseStats();
         public int sockets = 0;
@@ -130,7 +127,6 @@ namespace Xianxia.Items
                 realmRequirement = realm,
                 bindType = bind,
                 level = dto.level,
-                stackSize = Mathf.Max(1, dto.stackSize),
                 maxStack = Mathf.Max(1, dto.maxStack),
                 baseStats = dto.baseStats ?? new BaseStats(),
                 sockets = Mathf.Max(0, dto.sockets),

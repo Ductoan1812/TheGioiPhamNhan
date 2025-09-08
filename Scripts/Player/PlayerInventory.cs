@@ -16,6 +16,7 @@ public class PlayerInventory : MonoBehaviour
     private List<InventoryItem> inventory;
     private EquipmentData equipment;
     private int maxSlots = 0;
+    private const int DefaultInventorySize = 30;
 
     private void Awake()
     {
@@ -54,8 +55,18 @@ public class PlayerInventory : MonoBehaviour
             Debug.LogWarning("[PlayerInventory] failed to load player data");
             return;
         }
+        if (data.InventorySize <= 0)
+        {
+            Debug.LogWarning($"[PlayerInventory] Invalid InventorySize={data.InventorySize}. Auto-correcting to {DefaultInventorySize}.");
+            data.InventorySize = DefaultInventorySize;
+            // Persist fix so it doesn't recur
+            PlayerManager.Instance?.SavePlayer();
+        }
         maxSlots = data.InventorySize;
-        inventory = data.inventory;
+        // Clean corrupted/empty entries (only keep entries that truly have an item)
+        inventory = (data.inventory ?? new List<InventoryItem>())
+            .Where(HasRealItem)
+            .ToList();
         equipment = data.equipment;
     }
 
@@ -73,6 +84,7 @@ public class PlayerInventory : MonoBehaviour
         int maxStack = item.maxStack > 0 ? item.maxStack : int.MaxValue;
         foreach (var exist in inventory)
         {
+            if (!HasRealItem(exist)) continue;
             if (IsSameItem(exist, item) && exist.quantity < exist.maxStack)
             {
                 int canAdd = Math.Min(exist.maxStack - exist.quantity, remaining);
@@ -90,9 +102,27 @@ public class PlayerInventory : MonoBehaviour
                 break;
             }
             int stackAmount = Math.Min(maxStack, remaining);
-            var newItem = item;
-            newItem.quantity = stackAmount;
-            newItem.Slot = slot;
+            var newItem = new InventoryItem
+            {
+                id = item.id,
+                addressIcon = item.addressIcon,
+                addressTexture = item.addressTexture,
+                name = item.name,
+                category = item.category,
+                rarity = item.rarity,
+                element = item.element,
+                realmRequirement = item.realmRequirement,
+                bindType = item.bindType,
+                level = item.level,
+                maxStack = item.maxStack,
+                baseStats = item.baseStats,
+                sockets = item.sockets,
+                affixes = item.affixes,
+                useEffect = item.useEffect,
+                flavor = item.flavor,
+                quantity = stackAmount,
+                Slot = slot,
+            };
             inventory.Add(newItem);
             remaining -= stackAmount;
         }
@@ -152,7 +182,6 @@ public class PlayerInventory : MonoBehaviour
             realmRequirement = src.realmRequirement,
             bindType = src.bindType,
             level = src.level,
-            stackSize = src.stackSize,
             maxStack = src.maxStack,
             baseStats = src.baseStats,
             sockets = src.sockets,
@@ -168,11 +197,16 @@ public class PlayerInventory : MonoBehaviour
     private bool TryAddItemAtIndex(InventoryItem item, int index)
     {
         if (item == null) return false;
-        if (index < 0 || index >= maxSlots) return false;
+        int capacity = maxSlots > 0 ? maxSlots : Math.Max(1, PlayerManager.Instance?.Data?.InventorySize ?? 0);
+        if (capacity <= 0) capacity = DefaultInventorySize;
+        if (maxSlots <= 0) maxSlots = capacity; // cache for future calls
+        if (index < 0 || index >= capacity) return false;
         // Tìm item đang ở slot index (nếu có)
         var existing = inventory.FirstOrDefault(x => x.Slot == index);
-        if (existing == null)
+        if (existing == null || !HasRealItem(existing))
         {
+            // Xóa mọi entry rác ở slot này trước khi đặt
+            inventory.RemoveAll(x => x.Slot == index && !HasRealItem(x));
             item.Slot = index;
             inventory.Add(item);
             return true;
@@ -293,58 +327,149 @@ public class PlayerInventory : MonoBehaviour
             {
                 var clone = CloneAsSingle(oldItem);
                 placed = TryAddItemAtIndex(clone, targetIndex.Value);
-                if (placed == false)
+                if (!placed)
                 {
-                    // Nếu không đặt được đúng ô, thêm theo quy tắc bình thường
-                    AddItem(clone);
-                    placed = true;
+                    placed = AddItem(clone);
                 }
             }
             else
             {
-                AddItem(oldItem);
-                placed = true;
+                placed = AddItem(oldItem);
             }
 
-            if (placed)
+            if (!placed)
             {
-                SaveInventory();
-                Debug.Log($"[PlayerInventory] Unequipped {oldItem.id} (x1) from {slotId} and saved.");
-                var invUi = FindFirstObjectByType<InventoryUIManager>();
-                if (invUi != null) invUi.RefreshFromCurrentData();
-                var eqUi = FindFirstObjectByType<EquipmentUIManager>();
-                if (eqUi != null) eqUi.UpdateSlotUI(slotId, null);
-                var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
-                if (eqVisual != null) eqVisual.RefreshSlotVisual(slotId, null);
+                // Túi đầy -> thả vật phẩm ra thế giới tại vị trí người chơi
+                bool dropped = TryDropUnequipped(oldItem, slotId);
+                if (!dropped)
+                {
+                    // Không thể drop (thiếu ItemDropManager). Thử re-equip để không mất item.
+                    Debug.LogWarning($"[PlayerInventory] Inventory full and no ItemDropManager. Re-equipping {oldItem.id} back to {slotId}.");
+                    equipment.Equip(slotId, oldItem, overwrite: true);
+                    return;
+                }
             }
+
+            // Save + refresh UI/visuals (đã unequip khỏi slot)
+            SaveInventory();
+            Debug.Log($"[PlayerInventory] Unequipped {oldItem.id} (x1) from {slotId}. {(placed ? "Added to inventory" : "Dropped to world")} and saved.");
+            var invUi = FindFirstObjectByType<InventoryUIManager>();
+            if (invUi != null) invUi.RefreshFromCurrentData();
+            var eqUi = FindFirstObjectByType<EquipmentUIManager>();
+            if (eqUi != null) eqUi.UpdateSlotUI(slotId, null);
+            var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
+            if (eqVisual != null) eqVisual.RefreshSlotVisual(slotId, null);
         }
     }
+
+    // Move or swap items between two equipment slots without modifying inventory stacks
+    public bool MoveEquipment(string fromSlot, string toSlot)
+    {
+        if (equipment == null)
+        {
+            Debug.LogWarning("[PlayerInventory] No equipment data");
+            return false;
+        }
+        if (string.IsNullOrEmpty(fromSlot) || string.IsNullOrEmpty(toSlot)) return false;
+        fromSlot = fromSlot.ToLowerInvariant();
+        toSlot = toSlot.ToLowerInvariant();
+        if (fromSlot == toSlot) return true;
+
+        // Map of equip slot -> allowed category
+        var slotCategory = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "weapon_l", "weapon" },
+            { "weapon_r", "weapon" },
+            { "helmet",   "helmet" },
+            { "armor",    "armor"  },
+            { "ring_l",   "accessory" },
+            { "ring_r",   "accessory" },
+            { "body",     "body"   },
+            { "foot",     "foot"   },
+            { "cloth",    "cloth"  },
+            { "back",     "back"   },
+            { "pet",      "pet"    },
+        };
+
+        if (!slotCategory.ContainsKey(fromSlot) || !slotCategory.ContainsKey(toSlot))
+        {
+            Debug.LogWarning($"[PlayerInventory] Unknown slot(s): '{fromSlot}' or '{toSlot}'");
+            return false;
+        }
+
+        // Read current items
+        equipment.TryGet(fromSlot, out var fromItem);
+        equipment.TryGet(toSlot, out var toItem);
+        if (fromItem == null)
+        {
+            // nothing to move
+            return false;
+        }
+
+        string catFrom = fromItem.category.ToString().ToLowerInvariant();
+        if (!string.Equals(catFrom, slotCategory[toSlot], StringComparison.OrdinalIgnoreCase))
+        {
+            Debug.LogWarning($"[PlayerInventory] Cannot move item '{fromItem.name}' ({catFrom}) to slot '{toSlot}' (expects {slotCategory[toSlot]})");
+            return false;
+        }
+        if (toItem != null)
+        {
+            string catTo = toItem.category.ToString().ToLowerInvariant();
+            if (!string.Equals(catTo, slotCategory[fromSlot], StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.LogWarning($"[PlayerInventory] Cannot swap: target item '{toItem.name}' ({catTo}) incompatible with slot '{fromSlot}' (expects {slotCategory[fromSlot]})");
+                return false;
+            }
+        }
+
+        // Perform move/swap in equipment only (no inventory change), keep original references
+        bool setTo = equipment.Equip(toSlot, fromItem, overwrite: true);
+        bool setFrom = equipment.Equip(fromSlot, toItem, overwrite: true);
+        if (!setTo || !setFrom)
+        {
+            Debug.LogWarning("[PlayerInventory] MoveEquipment failed to set slots");
+            return false;
+        }
+
+        // Persist and refresh relevant UIs/visuals
+        SaveInventory();
+        var eqUi = FindFirstObjectByType<EquipmentUIManager>();
+        if (eqUi != null)
+        {
+            eqUi.UpdateSlotUI(fromSlot, toItem);
+            eqUi.UpdateSlotUI(toSlot, fromItem);
+        }
+        var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
+        if (eqVisual != null)
+        {
+            eqVisual.RefreshSlotVisual(fromSlot, toItem);
+            eqVisual.RefreshSlotVisual(toSlot, fromItem);
+        }
+        return true;
+    }
     //========================= hàm tiên ích ========================
+    // So sánh để gộp stack/nhận biết cùng loại: chỉ dựa trên id định danh.
+    // Lưu ý: số lượng runtime dùng InventoryItem.quantity; ItemData.stackSize chỉ là mặc định khi spawn.
     public bool IsSameItem(InventoryItem a, InventoryItem b)
     {
         if (a == null || b == null) return false;
-        return a.id == b.id
-            && a.addressIcon == b.addressIcon
-            && a.addressTexture == b.addressTexture
-            && a.name == b.name
-            && a.category == b.category
-            && a.rarity == b.rarity
-            && a.element == b.element
-            && a.realmRequirement == b.realmRequirement
-            && a.bindType == b.bindType
-            && a.level == b.level
-            && a.stackSize == b.stackSize
-            && a.maxStack == b.maxStack
-            && a.baseStats == b.baseStats
-            && a.sockets == b.sockets
-            && a.affixes == b.affixes
-            && a.useEffect == b.useEffect
-            && a.flavor == b.flavor;
+        return a.id == b.id;
     }
     public int GetEmptySlot()
     {
-        HashSet<int> usedSlots = new HashSet<int>(inventory.Select(item => item.Slot));
-        for (int i = 0; i < maxSlots; i++)
+        int capacity = maxSlots > 0 ? maxSlots : Math.Max(1, PlayerManager.Instance?.Data?.InventorySize ?? 0);
+        if (capacity <= 0) capacity = DefaultInventorySize;
+        if (maxSlots <= 0) maxSlots = capacity; // cache the resolved capacity
+
+        var usedSlots = new HashSet<int>(
+            inventory != null 
+                ? inventory.Where(HasRealItem).Select(it => it.Slot) 
+                : System.Linq.Enumerable.Empty<int>()
+        );
+        // Debug ra các slot đã dùng
+        Debug.Log("Used slots: " + string.Join(", ", usedSlots));
+
+        for (int i = 0; i < capacity; i++)
         {
             if (!usedSlots.Contains(i))
                 return i;
@@ -355,8 +480,40 @@ public class PlayerInventory : MonoBehaviour
     {
         var data = PlayerManager.Instance?.Data;
         if (data == null) { Debug.LogWarning("[PlayerInventory] No player data"); return; }
+        // Chỉ lưu những entry thật sự có item
+        inventory = (inventory ?? new List<InventoryItem>()).Where(HasRealItem).ToList();
         data.inventory = inventory;
         data.equipment = equipment;
         PlayerManager.Instance.SavePlayer();
+    }
+
+    // Một entry có item thật sự: id hợp lệ và quantity > 0
+    private bool HasRealItem(InventoryItem it)
+    {
+        return it != null && !string.IsNullOrEmpty(it.id) && it.quantity > 0;
+    }
+
+    // Thử thả vật phẩm unequip ra thế giới nếu túi đầy
+    private bool TryDropUnequipped(InventoryItem item, string fromSlot)
+    {
+        if (item == null) return false;
+        // Tìm vị trí người chơi: ưu tiên Camera.main (center), fallback vị trí của PlayerInventory GameObject
+        Vector3 pos;
+        if (Camera.main != null)
+            pos = Camera.main.transform.position + Camera.main.transform.forward * 1.5f;
+        else
+            pos = this.transform.position;
+
+        var dropMgr = FindFirstObjectByType<ItemDropManager>();
+        if (dropMgr == null)
+        {
+            Debug.LogWarning("[PlayerInventory] No ItemDropManager found in scene, cannot drop unequipped item.");
+            return false;
+        }
+        // Dùng clone x1 để rơi
+        var dropItem = CloneAsSingle(item);
+        dropMgr.Spawn(dropItem, pos + Vector3.right * 0.5f);
+        Debug.Log($"[PlayerInventory] Dropped unequipped item {item.id} from {fromSlot} at {pos}");
+        return true;
     }
 }

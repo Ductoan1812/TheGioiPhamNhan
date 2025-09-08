@@ -163,7 +163,6 @@ public class ItemDropTool : EditorWindow
             inv.realmRequirement = def.realmRequirement;
             inv.bindType = def.bindType;
             inv.level = def.level;
-            inv.stackSize = def.stackSize;
             inv.maxStack = def.maxStack;
             inv.baseStats = def.baseStats;
             inv.sockets = def.sockets;
