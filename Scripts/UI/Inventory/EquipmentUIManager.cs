@@ -28,6 +28,12 @@ public class EquipmentUIManager : MonoBehaviour
         EnsureLists();
         BuildMap();
         SubscribeSlotHandlers();
+
+        // Nếu dữ liệu đã có sẵn trước khi script này bật, refresh ngay
+        if (PlayerManager.Instance != null && PlayerManager.Instance.Data != null)
+        {
+            OnPlayerDataLoaded(PlayerManager.Instance.Data);
+        }
     }
 
     private void OnDisable()

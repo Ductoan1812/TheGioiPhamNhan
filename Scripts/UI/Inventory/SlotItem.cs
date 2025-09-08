@@ -15,7 +15,8 @@ public class SlotItem : MonoBehaviour,
     IEndDragHandler,
     IDropHandler,
     IPointerEnterHandler,
-    IPointerExitHandler
+    IPointerExitHandler,
+    ICancelHandler
 {
     [Header("Tham chiếu UI")]
     public Image iconImage;
@@ -55,10 +56,16 @@ public class SlotItem : MonoBehaviour,
     private static GameObject s_dragIcon;
     private static Canvas s_dragCanvas;
 
+    private int _iconVersion = 0; // dùng để hủy kết quả load async cũ
+
     private void Awake()
     {
         // Mặc định ẩn icon/số lượng nếu chưa có item
-        if (iconImage != null) iconImage.enabled = false;
+        if (iconImage != null)
+        {
+            iconImage.enabled = false;
+            iconImage.sprite = null;
+        }
         if (quantityText != null) quantityText.text = string.Empty;
     }
 
@@ -66,14 +73,27 @@ public class SlotItem : MonoBehaviour,
     public async void SetItem(InventoryItem item)
     {
         currentItem = item;
-    if (item != null) slotIndex = item.Slot;
-        await RefreshIconAsync();
+        if (item != null) slotIndex = item.Slot;
+
+        if (item == null)
+        {
+            Clear();
+            return;
+        }
+
+        int ver = ++_iconVersion;
+        await RefreshIconAsyncInternal(ver, item.addressIcon, item.quantity);
     }
 
     public void Clear()
     {
         currentItem = null;
-        if (iconImage != null) iconImage.enabled = false;
+        _iconVersion++; // vô hiệu hóa mọi load icon đang chờ
+        if (iconImage != null)
+        {
+            iconImage.enabled = false;
+            iconImage.sprite = null;
+        }
         if (quantityText != null) quantityText.text = string.Empty;
     }
 
@@ -86,55 +106,70 @@ public class SlotItem : MonoBehaviour,
         if (iconImage == null || quantityText == null)
             return;
 
-        if (item != null)
+        if (item == null)
         {
-            Sprite icon = null;
-            if (!string.IsNullOrEmpty(iconAddress))
-                icon = await ItemAssets.LoadIconSpriteAsync(iconAddress);
+            Clear();
+            return;
+        }
 
-            if (icon != null)
-            {
-                iconImage.sprite = icon;
-                iconImage.enabled = true;
-                quantityText.text = showQuantity && item.quantity > 1 ? item.quantity.ToString() : string.Empty;
-            }
-            else
-            {
-                iconImage.enabled = false;
-                quantityText.text = string.Empty;
-            }
+        int ver = ++_iconVersion;
+        Sprite icon = null;
+        if (!string.IsNullOrEmpty(iconAddress))
+            icon = await ItemAssets.LoadIconSpriteAsync(iconAddress);
+        if (ver != _iconVersion) return; // bị thay đổi trong lúc chờ -> bỏ kết quả
+
+        if (icon != null)
+        {
+            iconImage.sprite = icon;
+            iconImage.enabled = true;
+            quantityText.text = showQuantity && item.quantity > 1 ? item.quantity.ToString() : string.Empty;
         }
         else
         {
             iconImage.enabled = false;
+            iconImage.sprite = null;
             quantityText.text = string.Empty;
         }
     }
 
     // Cập nhật icon/số lượng (gọi khi thay đổi item)
-    public async Task RefreshIconAsync()
+    public async System.Threading.Tasks.Task RefreshIconAsync()
+    {
+        int ver = ++_iconVersion;
+        var itm = currentItem; // chụp lại tham chiếu hiện tại
+        string addr = itm != null ? itm.addressIcon : null;
+        int qty = itm != null ? itm.quantity : 0;
+        await RefreshIconAsyncInternal(ver, addr, qty);
+    }
+
+    private async System.Threading.Tasks.Task RefreshIconAsyncInternal(int version, string addressIcon, int quantity)
     {
         if (iconImage == null || quantityText == null)
             return;
 
-        if (currentItem != null && currentItem.quantity > 0)
+        if (currentItem != null && quantity > 0 && !string.IsNullOrEmpty(addressIcon))
         {
-            Sprite icon = await ItemAssets.LoadIconSpriteAsync(currentItem.addressIcon);
+            Sprite icon = await ItemAssets.LoadIconSpriteAsync(addressIcon);
+            if (version != _iconVersion) return; // đã bị thay đổi trong lúc chờ
+
             if (icon != null)
             {
                 iconImage.sprite = icon;
                 iconImage.enabled = true;
-                quantityText.text = currentItem.quantity > 1 ? currentItem.quantity.ToString() : string.Empty;
+                quantityText.text = quantity > 1 ? quantity.ToString() : string.Empty;
             }
             else
             {
                 iconImage.enabled = false;
+                iconImage.sprite = null;
                 quantityText.text = string.Empty;
             }
         }
         else
         {
+            if (version != _iconVersion) return;
             iconImage.enabled = false;
+            iconImage.sprite = null;
             quantityText.text = string.Empty;
         }
     }
@@ -192,8 +227,12 @@ public class SlotItem : MonoBehaviour,
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        DestroyDragIcon();
-        s_dragSource = null;
+        // Chỉ huỷ icon nếu chúng ta là nguồn kéo
+        if (s_dragSource == this)
+        {
+            DestroyDragIcon();
+            s_dragSource = null;
+        }
 
         onEndDrag?.Invoke(this);
         EndedDrag?.Invoke(this);
@@ -204,9 +243,25 @@ public class SlotItem : MonoBehaviour,
         if (s_dragSource == null || s_dragSource == this) return;
         onDropOnThis?.Invoke(s_dragSource, this);
         DroppedOnThis?.Invoke(s_dragSource, this);
+        // đảm bảo icon kéo được huỷ sau khi drop thành công
+        DestroyDragIcon();
+        s_dragSource = null;
     }
 
-    //=================== Hỗ trợ kéo icon ===================
+    public void OnCancel(BaseEventData eventData)
+    {
+        // Hệ thống huỷ thao tác kéo (mở menu, mất focus, v.v.)
+        if (s_dragSource == this)
+        {
+            DestroyDragIcon();
+            s_dragSource = null;
+        }
+        else
+        {
+            DestroyDragIcon();
+        }
+    }
+
     private void CreateDragIcon()
     {
         if (iconImage == null || iconImage.sprite == null) return;
@@ -216,6 +271,7 @@ public class SlotItem : MonoBehaviour,
             var c = GetComponentInParent<Canvas>();
             s_dragCanvas = c != null ? c.rootCanvas : null;
         }
+        if (s_dragCanvas == null) return; // không có canvas thì bỏ drag icon
 
         s_dragIcon = new GameObject("DraggingIcon", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         var img = s_dragIcon.GetComponent<Image>();
@@ -225,8 +281,7 @@ public class SlotItem : MonoBehaviour,
 
         var rt = s_dragIcon.GetComponent<RectTransform>();
         rt.sizeDelta = (iconImage.transform as RectTransform)?.sizeDelta ?? new Vector2(64, 64);
-        if (s_dragCanvas != null)
-            s_dragIcon.transform.SetParent(s_dragCanvas.transform, worldPositionStays: false);
+        s_dragIcon.transform.SetParent(s_dragCanvas.transform, worldPositionStays: false);
     }
 
     private void UpdateDragIconPosition(PointerEventData eventData)

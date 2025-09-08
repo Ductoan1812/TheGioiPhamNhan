@@ -136,6 +136,60 @@ public class PlayerInventory : MonoBehaviour
         SaveInventory();
         return remaining == 0;
     }
+    // Tạo bản sao item với quantity=1 để lưu ở ô trang bị (không dùng chung reference với stack trong túi)
+    private InventoryItem CloneAsSingle(InventoryItem src)
+    {
+        if (src == null) return null;
+        return new InventoryItem
+        {
+            id = src.id,
+            addressIcon = src.addressIcon,
+            addressTexture = src.addressTexture,
+            name = src.name,
+            category = src.category,
+            rarity = src.rarity,
+            element = src.element,
+            realmRequirement = src.realmRequirement,
+            bindType = src.bindType,
+            level = src.level,
+            stackSize = src.stackSize,
+            maxStack = src.maxStack,
+            baseStats = src.baseStats,
+            sockets = src.sockets,
+            affixes = src.affixes,
+            useEffect = src.useEffect,
+            flavor = src.flavor,
+            quantity = 1,
+            Slot = -1,
+        };
+    }
+
+    // Cố gắng đặt item vào chỉ số slot cụ thể trong túi
+    private bool TryAddItemAtIndex(InventoryItem item, int index)
+    {
+        if (item == null) return false;
+        if (index < 0 || index >= maxSlots) return false;
+        // Tìm item đang ở slot index (nếu có)
+        var existing = inventory.FirstOrDefault(x => x.Slot == index);
+        if (existing == null)
+        {
+            item.Slot = index;
+            inventory.Add(item);
+            return true;
+        }
+        // Nếu cùng loại và còn chỗ thì gộp
+        if (IsSameItem(existing, item) && existing.quantity < existing.maxStack)
+        {
+            int canAdd = Math.Max(0, existing.maxStack - existing.quantity);
+            int move = Math.Min(canAdd, item.quantity);
+            existing.quantity += move;
+            item.quantity -= move;
+            // Nếu item hết sau khi gộp thì coi như thành công
+            return item.quantity == 0;
+        }
+        return false;
+    }
+
     public void EquipItem(InventoryItem item, string equipSlot)
     {
         if (item == null) return;
@@ -177,10 +231,19 @@ public class PlayerInventory : MonoBehaviour
         }
         string slotId = equipSlot?.ToLowerInvariant();
 
-        var oldItem = equipment.Unequip(slotId);
-        if (oldItem != null) AddItem(oldItem);
+        // Luôn tạo bản sao số lượng 1 để trang bị
+        var single = CloneAsSingle(item);
 
-        bool ok = equipment.Equip(slotId, item, overwrite: true);
+        // Nếu slot đã có item: tháo ra trước và trả về túi
+        var oldItem = equipment.Unequip(slotId);
+        if (oldItem != null)
+        {
+            // Đảm bảo oldItem.quantity = 1
+            oldItem.quantity = 1;
+            AddItem(oldItem);
+        }
+
+        bool ok = equipment.Equip(slotId, single, overwrite: true);
         if (!ok)
         {
             if (oldItem != null) equipment.Equip(slotId, oldItem, overwrite: true);
@@ -188,16 +251,25 @@ public class PlayerInventory : MonoBehaviour
             return;
         }
 
+        // Trừ 1 từ stack của inventory gốc
         RemoveItem(item, 1);
         SaveInventory();
-        Debug.Log($"[PlayerInventory] Equipped {item.id} to {slotId} and saved.");
+        Debug.Log($"[PlayerInventory] Equipped {single.id} (x1) to {slotId} and saved.");
 
+        var invUi = FindFirstObjectByType<InventoryUIManager>();
+        if (invUi != null) invUi.RefreshFromCurrentData();
         var eqUi = FindFirstObjectByType<EquipmentUIManager>();
-        if (eqUi != null) eqUi.UpdateSlotUI(slotId, item);
+        if (eqUi != null) eqUi.UpdateSlotUI(slotId, single);
         var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
-        if (eqVisual != null) eqVisual.RefreshSlotVisual(slotId, item);
+        if (eqVisual != null) eqVisual.RefreshSlotVisual(slotId, single);
     }
+
     public void UnEquipItem(string equipSlot)
+    {
+        UnEquipItem(equipSlot, null);
+    }
+
+    public void UnEquipItem(string equipSlot, int? targetIndex)
     {
         if (equipment == null)
         {
@@ -214,13 +286,37 @@ public class PlayerInventory : MonoBehaviour
         var oldItem = equipment.Unequip(slotId);
         if (oldItem != null)
         {
-            AddItem(oldItem);
-            SaveInventory();
-            Debug.Log($"[PlayerInventory] Unequipped {oldItem.id} from {slotId} and saved.");
-            var eqUi = FindFirstObjectByType<EquipmentUIManager>();
-            if (eqUi != null) eqUi.UpdateSlotUI(slotId, null);
-            var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
-            if (eqVisual != null) eqVisual.RefreshSlotVisual(slotId, null);
+            // Bảo toàn quy tắc: item từ trang bị luôn số lượng 1
+            oldItem.quantity = 1;
+            bool placed = false;
+            if (targetIndex.HasValue)
+            {
+                var clone = CloneAsSingle(oldItem);
+                placed = TryAddItemAtIndex(clone, targetIndex.Value);
+                if (placed == false)
+                {
+                    // Nếu không đặt được đúng ô, thêm theo quy tắc bình thường
+                    AddItem(clone);
+                    placed = true;
+                }
+            }
+            else
+            {
+                AddItem(oldItem);
+                placed = true;
+            }
+
+            if (placed)
+            {
+                SaveInventory();
+                Debug.Log($"[PlayerInventory] Unequipped {oldItem.id} (x1) from {slotId} and saved.");
+                var invUi = FindFirstObjectByType<InventoryUIManager>();
+                if (invUi != null) invUi.RefreshFromCurrentData();
+                var eqUi = FindFirstObjectByType<EquipmentUIManager>();
+                if (eqUi != null) eqUi.UpdateSlotUI(slotId, null);
+                var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
+                if (eqVisual != null) eqVisual.RefreshSlotVisual(slotId, null);
+            }
         }
     }
     //========================= hàm tiên ích ========================

@@ -26,6 +26,12 @@ public class InventoryUIManager : MonoBehaviour
         }
     }
 
+    public void RefreshFromCurrentData()
+    {
+        var data = PlayerManager.Instance != null ? PlayerManager.Instance.Data : null;
+        RebuildFromData(data);
+    }
+
     private void OnDisable()
     {
         if (PlayerManager.Instance != null)
@@ -93,7 +99,6 @@ public class InventoryUIManager : MonoBehaviour
     {
         if (source == null || target == null || source == target) return;
 
-        // Nếu nguồn là ô trang bị: tháo và đặt vào ô inventory đích
         var eq = FindFirstObjectByType<EquipmentUIManager>();
         string equipSlotName = null;
         if (eq != null && eq.equipSlots != null)
@@ -109,107 +114,8 @@ public class InventoryUIManager : MonoBehaviour
         }
         if (!string.IsNullOrEmpty(equipSlotName))
         {
-            var pd = PlayerManager.Instance?.Data;
-            if (pd == null) return;
-            var oldItem = pd.equipment.Unequip(equipSlotName);
-            if (oldItem == null)
-            {
-                // Không có gì để tháo
-                if (eq != null) eq.UpdateSlotUI(equipSlotName, null);
-                var eqVisual0 = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
-                if (eqVisual0 != null) eqVisual0.RefreshSlotVisual(equipSlotName, null);
-                return;
-            }
-
-            var b = target.CurrentItem;
-            // Trường hợp ô đích trống -> đặt trực tiếp
-            if (b == null || b.quantity <= 0)
-            {
-                oldItem.Slot = target.slotIndex;
-                pd.inventory.Add(oldItem);
-                target.SetItem(oldItem);
-            }
-            else if (playerInventory != null && playerInventory.IsSameItem(oldItem, b))
-            {
-                // Ghép stack nếu cùng item
-                int canAdd = Mathf.Max(0, b.maxStack - b.quantity);
-                if (canAdd > 0)
-                {
-                    int move = Mathf.Min(canAdd, oldItem.quantity);
-                    b.quantity += move;
-                    oldItem.quantity -= move;
-                    target.SetItem(b);
-
-                    if (oldItem.quantity > 0)
-                    {
-                        // Phần còn lại: tìm slot trống
-                        int empty = playerInventory.GetEmptySlot();
-                        if (empty != -1)
-                        {
-                            oldItem.Slot = empty;
-                            pd.inventory.Add(oldItem);
-                            // Nếu UI đã build đủ slot, cập nhật
-                            if (empty >= 0 && empty < slots.Count)
-                                slots[empty].SetItem(oldItem);
-                        }
-                        else
-                        {
-                            // Không còn chỗ -> trả ngược lại trang bị để tránh mất item
-                            pd.equipment.Equip(equipSlotName, oldItem, overwrite: true);
-                        }
-                    }
-                }
-                else
-                {
-                    // Không thể ghép nữa -> xử lý như swap nhẹ: tìm chỗ trống cho b
-                    int empty = playerInventory != null ? playerInventory.GetEmptySlot() : -1;
-                    if (empty != -1)
-                    {
-                        b.Slot = empty;
-                        if (empty >= 0 && empty < slots.Count)
-                            slots[empty].SetItem(b);
-                        // Đặt oldItem vào ô target
-                        oldItem.Slot = target.slotIndex;
-                        // b đang là reference trong data.inventory, oldItem chưa có -> thêm
-                        pd.inventory.Add(oldItem);
-                        target.SetItem(oldItem);
-                    }
-                    else
-                    {
-                        // Hết chỗ -> trả lại trang bị
-                        pd.equipment.Equip(equipSlotName, oldItem, overwrite: true);
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                // Ô đích có item khác -> đổi chỗ: đẩy item b sang chỗ trống, đặt oldItem vào target
-                int empty = playerInventory != null ? playerInventory.GetEmptySlot() : -1;
-                if (empty != -1)
-                {
-                    b.Slot = empty;
-                    if (empty >= 0 && empty < slots.Count)
-                        slots[empty].SetItem(b);
-                    oldItem.Slot = target.slotIndex;
-                    pd.inventory.Add(oldItem);
-                    target.SetItem(oldItem);
-                }
-                else
-                {
-                    // Không có chỗ -> hủy thao tác
-                    pd.equipment.Equip(equipSlotName, oldItem, overwrite: true);
-                    return;
-                }
-            }
-
-            // Cập nhật ô trang bị (clear icon) và visual
-            if (eq != null) eq.UpdateSlotUI(equipSlotName, null);
-            var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
-            if (eqVisual != null) eqVisual.RefreshSlotVisual(equipSlotName, null);
-
-            // Lưu
-            Save();
+            // Chuyển sang luồng thống nhất: UnEquipItem(slot, targetIndex)
+            playerInventory?.UnEquipItem(equipSlotName, target.slotIndex);
             return;
         }
 
