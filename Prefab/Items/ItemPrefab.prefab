@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5218566850400495848}
   - component: {fileID: 6717156653303577188}
   - component: {fileID: 6058407403435519357}
-  - component: {fileID: 2826827449409538253}
+  - component: {fileID: 5789271969066095985}
   m_Layer: 9
   m_Name: ItemPrefab
   m_TagString: Item
@@ -95,7 +95,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -4611891317092368872, guid: 4ffb48fa33dbf2c41bb8d74ec844ff55, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -103,7 +103,7 @@ SpriteRenderer:
   m_Size: {x: 0.1875, y: 0.21875}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!58 &6058407403435519357
@@ -142,7 +142,7 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.25, y: 0}
   m_Radius: 0.5
---- !u!114 &2826827449409538253
+--- !u!114 &5789271969066095985
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -151,26 +151,56 @@ MonoBehaviour:
   m_GameObject: {fileID: 2691905775453150574}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fbd9bac9a7b6d4f449ae6c4d3b26a0ad, type: 3}
+  m_Script: {fileID: 11500000, guid: 94b57ade7f03d7c4ca0889be139b2f91, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ItemPrefab
-  itemId: 
+  m_EditorClassIdentifier: Assembly-CSharp::WordItem
+  item:
+    id: 
+    name: 
+    category: 0
+    rarity: 0
+    element: 0
+    realmRequirement: 0
+    bindType: 0
+    level: 1
+    stackSize: 1
+    maxStack: 1
+    baseStats:
+      atk: 0
+      defense: 0
+      hp: 0
+      qi: 0
+      moveSpd: 0
+      critRate: 0
+      critDmg: 0
+      penetration: 0
+      lifestealQi: 0
+      res:
+        kim: 0
+        moc: 0
+        thuy: 0
+        hoa: 0
+        tho: 0
+        loi: 0
+        am: 0
+        duong: 0
+    sockets: 0
+    affixes: []
+    useEffect:
+      type: 
+      magnitude: 0
+      duration: 0
+      spellId: 
+    flavor: 
+    addressIcon: 
+    addressTexture: 
+    Slot: 0
+    quantity: 0
   quantity: 1
-  level: 0
-  rarity: 
-  element: 
-  quality: 0
-  durability: 1
-  baseStats: []
-  affixes: []
-  tags: []
-  custom: []
-  iconRenderer: {fileID: 6717156653303577188}
-  quantityText: {fileID: 802526463738243193}
-  hideQuantityWhenOne: 1
-  pickupOnTrigger: 1
-  onlyPickupByPlayerId: 
-  pickupCooldown: 0.2
+  lifetimeSeconds: 30
+  itemDB: {fileID: 11400000, guid: e1dc69d3eb0c09a45a33bebcfa7218d7, type: 2}
+  spriteRenderer: {fileID: 6717156653303577188}
+  textMeshPro: {fileID: 802526463738243193}
 --- !u!1 &2711367944415379984
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,7 +218,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &87395704524646934
 RectTransform:
   m_ObjectHideFlags: 0

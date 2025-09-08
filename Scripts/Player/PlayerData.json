@@ -14,8 +14,8 @@
     "moveSpd": 5
   },
   "equipment": {
-    "weapon": { "id": "sword_iron", "level": 5, "affixes": [{ "id": "atk_boost", "value": 10 }] },
-    "armor": { "id": "cloth_01", "level": 3 }
+    "Weapon_R": { "id": "wp_phi_kiem_truc_co", "level": 5, "affixes": [{ "id": "atk_boost", "value": 10 }] },
+    "Armor": { "id": "cloth_01", "level": 3 }
   },
   "inventory": [
     { "id": "wp_phi_kiem_truc_co", "Slot": 1, "quantity": 5 },

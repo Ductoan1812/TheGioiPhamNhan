@@ -23,7 +23,7 @@ public class PlayerControler : MonoBehaviour
         if (input.x > 0) transform.localScale = new Vector3(-1, 1, 1);
         else if (input.x < 0) transform.localScale = new Vector3(1, 1, 1);
 
-        float speed = stats ? stats.MoveSpeed : moveSpeed;
+        float speed = stats ? stats.MoveSpd : moveSpeed;
         Vector2 velocity = new Vector2(input.x, input.y) * speed;
         rb.linearVelocity = velocity;
     }

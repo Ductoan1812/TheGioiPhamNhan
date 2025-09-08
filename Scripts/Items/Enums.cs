@@ -5,7 +5,8 @@ namespace Xianxia.Items
     [Serializable]
     public enum ItemCategory
     {
-        weapon, armor, accessory, artifact, consumable, material, manual, currency, quest
+        weapon, armor, cloth, back, foot, helmet, pet,accessory, artifact, consumable, material, manual, currency, quest
+        // vũ khí, áo giáp, y phục, áo choàng, giày, mũ, thú cưng, phụ kiện, bảo vật, tiêu hao, nguyên liệu, bí kíp, tiền tệ, nhiệm vụ
     }
 
     [Serializable]

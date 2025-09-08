@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: 79159b46a37048f4f9c6d31542565e88
   m_currentHash:
     serializedVersion: 2
-    Hash: 78a1945262ef2d76ad3f83452d3bb1e8
+    Hash: b1f75cd68c0cc6ad60ea32df7c000d53
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -53,7 +53,7 @@ MonoBehaviour:
     m_Id: 
   m_RemoteCatalogLoadPath:
     m_Id: 
-  m_ContentStateBuildPathProfileVariableName: 
+  m_ContentStateBuildPathProfileVariableName: <default settings path>
   m_CustomContentStateBuildPath: 
   m_ContentStateBuildPath: 
   m_BuildAddressablesWithPlayerBuild: 0
@@ -100,7 +100,15 @@ MonoBehaviour:
     m_ProfileVersion: 1
   m_LabelTable:
     m_LabelNames:
-    - default
+    - Body
+    - Hair
+    - Weapon
+    - Armor
+    - helmet
+    - Foot
+    - Cloth
+    - Back
+    - items
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 1d683ca9546425d42899e09d1b41c228, type: 2}

@@ -15,35 +15,488 @@ MonoBehaviour:
   m_GroupName: Items
   m_GUID: 9bbabcfb1bb831e4b9c334914807e9d9
   m_SerializeEntries:
+  - m_GUID: 03d21ba25a3d7f44ab05413c3b7851b7
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_9.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 05acd90107720574ea40932e9a221439
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_10.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1529dc9161ebf8e4ba82e9b4ac0e1017
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/5_Wand/Ward_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1b327695fb1a55e42a83a39153026ee6
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/F_SR_Helmet.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1d3bb7a05d119cd4a9dc60819f3841f8
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 1e1c0f43bbbfa2f4599ad43e9e0ba5df
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 205e3eab01494204c820b21947885630
+    m_Address: Assets/Sprites/Items/Equitments/Back/Back_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Back
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2dad32ea3c35e874ba17e7dbdc1e4e26
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_12.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2e20b1644f331eb49840f76cfbff2882
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_6.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 2f639be85c3be9842b02b0be9f3e9325
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/6_Hammer/F_SR_Hammer.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3123aa6547c7c9d4191934fdc33aad08
+    m_Address: Assets/Sprites/Player/1_Body/Human_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Body
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 36b113d79ce10ff43aff5283a2ad5922
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3dc44fbf1304bee469000b29ec8834a9
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 3e19590f3bfdc7d41804147f78b62f55
+    m_Address: Assets/Sprites/Items/Equitments/Pant/F_SR_Pants.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Foot
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 3f6f4288bfe7220408c48d8a6719631d
     m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_2.png
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 43b18d9d4840a2646be3ab4c4ac4efa3
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 440cb4defb0ea7c4598a852a050da698
     m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_3.png
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 46cf9b0ec6b4a2041beb473e796e96e6
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4b5da76a0f050a8418b4e341c69fa964
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_8.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 4ffb48fa33dbf2c41bb8d74ec844ff55
+    m_Address: Assets/Sprites/Player/1_Body/Human_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Body
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 53f5234b8104e384e8206f4ac7cd387d
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/F_SR_Cloth.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 59857b51b48dec446806d60b208a6fac
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 59953aabf48fabf4ba1a8dd367453ba9
+    m_Address: Assets/Sprites/Items/Equitments/Pant/Foot_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Foot
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 5ef0b913a48e5c5438d933deacda32b4
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6132110ca36332e44ae2e4746bf0620f
     m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_1.png
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6812044095fc4704daa96acf19b3db98
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_6.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 69573999a887fa2428423b58dacba94d
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c5e18a9aa7bb584e9acd1b5b85a7b29
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 762d536a08a10ad4bae8b03d0778a616
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_7.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 7f6c18ed71c50804a98cf303bef8499d
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 816d4054e3daf664391bd9e52a3431c9
+    m_Address: Assets/Sprites/Items/Equitments/Back/BowBack_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Back
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 81f000101942355478fd71d86cb65c72
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/4_Spear/Spear_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 82060a20ebdf3f34e8e244440c6b7426
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_8.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 830a94d8c73514a419c8ecd5dff19c39
+    m_Address: Assets/Sprites/Player/1_Body/Human_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Body
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 849d83e2aec192847b2548f9dc71fc9b
+    m_Address: Assets/Sprites/Player/1_Body/Human_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Body
+    - items
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8774881a1de122344b3d27fb390711b9
     m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_4.png
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 87d0bcc73cfb6df448dde209bceb34f8
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/4_Spear/Soon_Spear.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Weapon
+    - items
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 8c0003e3686c50346942dc833c80d487
     m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_6.png
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8c8c03bc6b718eb4bbaeba38de344a06
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8f8aa7f74eb64f244b5a634fbec5ef5a
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_9.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 97b617a0dc791454c86d5d06247c9141
+    m_Address: Assets/Sprites/Items/Equitments/Armor/None.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Back
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 9f7f16080f077b743b4bbe73541b3c4b
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_8.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a3cf69bc97a185a4c86ae945016bbefa
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_7.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: a665e2233042e1e4881db9218e029ca2
+    m_Address: Assets/Sprites/Items/Equitments/Pant/Foot_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Foot
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ad9a138a428b5a94b96331b87098b177
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_7.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: afddbf59290d70b48958c8ba1b4a1f41
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
     FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: b0038fe8d0b7b504696d2760e7f7289e
     m_Address: Assets/Sprites/Items/Equitments/Weapons/0_Sword/Sword_5.png
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b310b552af48d5544aa0ac2d9e78b6c0
+    m_Address: Assets/Sprites/Items/Equitments/Back/Back_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Back
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b3f18b0222b4865438a400370d2c7132
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_6.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: b61b5132bbe54914eb246dcda94151fa
+    m_Address: Assets/Sprites/Items/Equitments/Back/Soon_Back1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Back
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bb01710bec7ea7d4dae62426e4952a62
+    m_Address: Assets/Sprites/Player/1_Body/Human_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Body
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: bc069afaf7b7ffc44a2e27e3a5e3dcac
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/2_Bow/Bow_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: be7f1497667bae24998fa9bf2d7d28ca
+    m_Address: Assets/Sprites/Player/0_Hair/Hair_8.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Hair
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c42adbd821d846e44bde6bcc1e90baf8
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_5.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c5cadd8f58722ad43923e36cc461efc2
+    m_Address: Assets/Sprites/Items/Equitments/Pant/Foot_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Foot
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: c662633891a6579498a480fd180ccba7
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_4.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: ccc500078630c9f4fabe969ce9532a77
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_11.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d49bbf738155a5c48bd81be694996d5d
+    m_Address: Assets/Sprites/Items/Equitments/Armor/Armor_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Armor
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: d55c44d70e30b3a449095d6f0e01cb85
+    m_Address: Assets/Sprites/Items/Equitments/Pant/Foot_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Foot
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: df66b0eefe3e9a64db47a4c483b82a20
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_3.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e5bed1eb67ff0e946b296da75bef0bc1
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e96fd55c17f3b8f408a0d8277b7ed348
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_6.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: e970d438e6bee7a4286c1f8d74899344
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/3_Shield/Shield_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f132cabf60129804db423133e8023ec1
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_9.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f4f4fb3f8922b5e4bb54d3dd558af537
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f67d99ae255bfa644bdad80571e5f0cc
+    m_Address: Assets/Sprites/Items/Equitments/Helmet/Helmet_2.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - helmet
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: f6aa89bc175bf1b40afa9f8bf865a17a
+    m_Address: Assets/Sprites/Items/Equitments/Cloth/Cloth_7.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Cloth
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fc7a63f8c25aa0e4eabcdde21cc49e22
+    m_Address: Assets/Sprites/Items/Equitments/Weapons/1_Axe/Axe_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Weapon
+    - items
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fca52179e8c364748b3292b80201eabd
+    m_Address: Assets/Sprites/Items/Equitments/Back/Back_1.png
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Back
+    - items
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 5a7bdd191a34eef4eb0e2dc7a036a29e, type: 2}

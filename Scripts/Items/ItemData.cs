@@ -28,6 +28,45 @@ namespace Xianxia.Items
         // Addressables
         public string addressIcon;     // address Sprite
         public string addressTexture;  // address Texture2D
+
+        /// <summary>
+        /// Log toàn bộ thông tin chi tiết của item này ra console.
+        /// </summary>
+        public void LogDetail()
+        {
+            Debug.Log($"--- Thông tin Item ---\n" +
+                $"ID: {id}\n" +
+                $"Tên: {name}\n" +
+                $"Loại: {category}\n" +
+                $"Phẩm chất: {rarity}\n" +
+                $"Ngũ hành: {element}\n" +
+                $"Yêu cầu cảnh giới: {realmRequirement}\n" +
+                $"Ràng buộc: {bindType}\n" +
+                $"Cấp: {level}\n" +
+                $"Stack hiện tại: {stackSize}\n" +
+                $"Stack tối đa: {maxStack}\n" +
+                $"Chỉ số gốc: {baseStats}\n" +
+                $"Số socket: {sockets}\n" +
+                $"Affix: {AffixArrayToString(affixes)}\n" +
+                $"Hiệu ứng dùng: {(useEffect != null ? useEffect.ToString() : "None")}\n" +
+                $"Mô tả: {flavor}\n" +
+                $"Icon: {addressIcon}\n" +
+                $"Texture: {addressTexture}");
+        }
+
+        private string AffixArrayToString(AffixEntry[] arr)
+        {
+            if (arr == null || arr.Length == 0) return "Không có";
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            for (int i = 0; i < arr.Length; i++)
+            {
+                var a = arr[i];
+                if (a == null) continue;
+                sb.Append($"[{a.id}: {a.value} (tier {a.tier})]");
+                if (i < arr.Length - 1) sb.Append(", ");
+            }
+            return sb.ToString();
+        }
     }
 
     // DTO để parse JSON (enum ở dạng string)
