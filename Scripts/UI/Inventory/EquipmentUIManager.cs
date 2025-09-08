@@ -88,6 +88,8 @@ public class EquipmentUIManager : MonoBehaviour
             {
                 s.slotItem.DroppedOnThis += HandleDroppedOnEquipSlot;
                 s.slotItem.DoubleClicked += HandleEquipSlotDoubleClick;
+                s.slotItem.DroppedOutside += HandleEquipSlotDropOutside;
+                s.slotItem.BeganDrag += _ => UIManager.Instance?.ShowInventoryAndEquipment();
             }
         }
     }
@@ -101,6 +103,7 @@ public class EquipmentUIManager : MonoBehaviour
             {
                 s.slotItem.DroppedOnThis -= HandleDroppedOnEquipSlot;
                 s.slotItem.DoubleClicked -= HandleEquipSlotDoubleClick;
+                s.slotItem.DroppedOutside -= HandleEquipSlotDropOutside;
             }
         }
     }
@@ -192,5 +195,23 @@ public class EquipmentUIManager : MonoBehaviour
             return;
         }
         PlayerInventory.Instance.UnEquipItem(slotId);
+    }
+
+    // Kéo từ ô trang bị ra ngoài -> drop vật phẩm ra thế giới (không trả về túi)
+    private void HandleEquipSlotDropOutside(SlotItem slot)
+    {
+        if (slot == null) return;
+        string slotId = null;
+        foreach (var kv in _slotMap)
+        {
+            if (kv.Value.slotItem == slot) { slotId = kv.Key; break; }
+        }
+        if (string.IsNullOrEmpty(slotId)) return;
+        if (PlayerInventory.Instance == null)
+        {
+            Debug.LogWarning("[EquipmentUIManager] PlayerInventory.Instance is null");
+            return;
+        }
+        PlayerInventory.Instance.DropEquippedItem(slotId);
     }
 }

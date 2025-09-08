@@ -21,6 +21,8 @@ public class SlotItem : MonoBehaviour,
     [Header("Tham chiếu UI")]
     public Image iconImage;
     public TextMeshProUGUI quantityText;
+    [Tooltip("Tùy chọn: DB để lấy icon khi item không có addressIcon")]
+    [SerializeField] private ItemDatabaseSO itemDB;
 
     [Header("Vị trí Slot")]
     [Tooltip("Chỉ số slot trong túi (do UI gán)")]
@@ -34,6 +36,8 @@ public class SlotItem : MonoBehaviour,
     public SlotItemEvent onEndDrag;
     public SlotItemEvent onPointerEnter;
     public SlotItemEvent onPointerExit;
+    [Header("Sự kiện kéo ra ngoài")]
+    public SlotItemEvent onDropOutside; // phát khi kết thúc kéo mà không thả lên SlotItem nào
 
     // Sự kiện C# (tuỳ code đăng ký)
     public event Action<SlotItem> Clicked;
@@ -43,6 +47,7 @@ public class SlotItem : MonoBehaviour,
     public event Action<SlotItem> EndedDrag;
     public event Action<SlotItem> PointerEntered;
     public event Action<SlotItem> PointerExited;
+    public event Action<SlotItem> DroppedOutside;
 
     private InventoryItem currentItem;
     public InventoryItem CurrentItem => currentItem;
@@ -55,6 +60,8 @@ public class SlotItem : MonoBehaviour,
     private static SlotItem s_dragSource;
     private static GameObject s_dragIcon;
     private static Canvas s_dragCanvas;
+    // Cờ đánh dấu đã thả lên một SlotItem hợp lệ trong phiên kéo hiện tại
+    private static bool s_dropOccurred;
 
     private int _iconVersion = 0; // dùng để hủy kết quả load async cũ
 
@@ -147,10 +154,23 @@ public class SlotItem : MonoBehaviour,
         if (iconImage == null || quantityText == null)
             return;
 
+        // Nếu chưa có addressIcon, thử tra DB
+        if ((string.IsNullOrEmpty(addressIcon)) && currentItem != null)
+        {
+            var db = itemDB != null ? itemDB : ItemDatabaseSO.Instance;
+            var def = db != null ? db.GetById(currentItem.id) : null;
+            if (def != null && !string.IsNullOrEmpty(def.addressIcon))
+            {
+                addressIcon = def.addressIcon;
+            }
+        }
+
         if (currentItem != null && quantity > 0 && !string.IsNullOrEmpty(addressIcon))
         {
             Sprite icon = await ItemAssets.LoadIconSpriteAsync(addressIcon);
             if (version != _iconVersion) return; // đã bị thay đổi trong lúc chờ
+            // Bảo vệ: object có thể đã bị destroy trong thời gian chờ
+            if (this == null || iconImage == null || quantityText == null) return;
 
             if (icon != null)
             {
@@ -168,10 +188,18 @@ public class SlotItem : MonoBehaviour,
         else
         {
             if (version != _iconVersion) return;
+            if (this == null || iconImage == null || quantityText == null) return;
             iconImage.enabled = false;
             iconImage.sprite = null;
-            quantityText.text = string.Empty;
+            // Dù không có icon vẫn hiển thị số lượng để người chơi thấy có item
+            quantityText.text = quantity > 1 ? quantity.ToString() : (quantity > 0 ? "1" : string.Empty);
         }
+    }
+
+    private void OnDestroy()
+    {
+        // Vô hiệu hóa mọi yêu cầu load icon đang chờ để tránh callback động vào object đã destroy
+        _iconVersion++;
     }
 
     //=================== Sự kiện chuột ===================
@@ -213,6 +241,7 @@ public class SlotItem : MonoBehaviour,
         if (currentItem == null || currentItem.quantity <= 0) return;
 
         s_dragSource = this;
+    s_dropOccurred = false;
         CreateDragIcon();
         UpdateDragIconPosition(eventData);
 
@@ -231,6 +260,12 @@ public class SlotItem : MonoBehaviour,
         if (s_dragSource == this)
         {
             DestroyDragIcon();
+            // Nếu không có SlotItem nào nhận OnDrop -> coi như thả ra ngoài
+            if (!s_dropOccurred)
+            {
+                onDropOutside?.Invoke(this);
+                DroppedOutside?.Invoke(this);
+            }
             s_dragSource = null;
         }
 
@@ -241,6 +276,7 @@ public class SlotItem : MonoBehaviour,
     public void OnDrop(PointerEventData eventData)
     {
         if (s_dragSource == null || s_dragSource == this) return;
+    s_dropOccurred = true;
         onDropOnThis?.Invoke(s_dragSource, this);
         DroppedOnThis?.Invoke(s_dragSource, this);
         // đảm bảo icon kéo được huỷ sau khi drop thành công

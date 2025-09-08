@@ -12,6 +12,7 @@ public class UIManager : MonoBehaviour
     public GameObject menuPanel;        // Panel chứa các tab menu
     public GameObject inventoryPanel;
     public GameObject equipmentPanel;
+    public GameObject infoItemPanel;
     public GameObject settingsPanel;
 
     [Header("Buttons")]
@@ -33,19 +34,22 @@ public class UIManager : MonoBehaviour
 
         inventoryPanel.SetActive(false);
         equipmentPanel.SetActive(false);
-        settingsPanel.SetActive(false);
+    if (infoItemPanel != null) infoItemPanel.SetActive(false);
+    if (settingsPanel != null) settingsPanel.SetActive(false);
 
         // Bật panel tương ứng
         switch (numberState)
         {
             case 0:
                 inventoryPanel.SetActive(true);
+                RefreshInventoryUI();
                 break;
             case 1:
                 equipmentPanel.SetActive(true);
+                RefreshEquipmentUI();
                 break;
             case 2:
-                settingsPanel.SetActive(true);
+                if (settingsPanel != null) settingsPanel.SetActive(true);
                 break;
         }
     }
@@ -60,6 +64,7 @@ public class UIManager : MonoBehaviour
 
         // Mở tab mặc định = Inventory
         SwitchState(0);
+    RefreshInventoryUI();
     }
 
     public void ExitMenu()
@@ -78,7 +83,53 @@ public class UIManager : MonoBehaviour
         // Tắt hết menu tab
         inventoryPanel.SetActive(false);
         equipmentPanel.SetActive(false);
-        settingsPanel.SetActive(false);
+    if (infoItemPanel != null) infoItemPanel.SetActive(false);
+    if (settingsPanel != null) settingsPanel.SetActive(false);
 
+    }
+
+    // Hiển thị đồng thời Inventory + Equipment
+    public void ShowInventoryAndEquipment()
+    {
+        controllerPanel.SetActive(false);
+        menuPanel.SetActive(true);
+        openButton.SetActive(false);
+        exitButton.SetActive(true);
+
+        if (inventoryPanel != null) inventoryPanel.SetActive(true);
+        if (equipmentPanel != null) equipmentPanel.SetActive(true);
+        if (infoItemPanel != null) infoItemPanel.SetActive(false);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+
+    RefreshInventoryUI();
+    RefreshEquipmentUI();
+    }
+
+    // Hiển thị Inventory + InfoItem
+    public void ShowInventoryAndInfoItem()
+    {
+        controllerPanel.SetActive(false);
+        menuPanel.SetActive(true);
+        openButton.SetActive(false);
+        exitButton.SetActive(true);
+
+        if (inventoryPanel != null) inventoryPanel.SetActive(true);
+        if (equipmentPanel != null) equipmentPanel.SetActive(false);
+        if (infoItemPanel != null) infoItemPanel.SetActive(true);
+        if (settingsPanel != null) settingsPanel.SetActive(false);
+
+        RefreshInventoryUI();
+    }
+
+    private void RefreshInventoryUI()
+    {
+        var inv = FindFirstObjectByType<InventoryUIManager>(FindObjectsInactive.Include);
+        inv?.RefreshFromCurrentData();
+    }
+
+    private void RefreshEquipmentUI()
+    {
+        var eq = FindFirstObjectByType<EquipmentUIManager>(FindObjectsInactive.Include);
+        eq?.RefreshAllSlots();
     }
 }

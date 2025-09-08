@@ -13,8 +13,13 @@ public class ItemDetailsPanel : MonoBehaviour
     public Image icon;
     public TextMeshProUGUI nameText;
     public TextMeshProUGUI descText;
+    [Header("Actions")]
+    public Button useButton;
+    public Button splitButton;
+    public TMP_InputField splitQuantityInput;
     [Header("Nguồn dữ liệu")]
     public ItemDatabaseSO itemDB; // nếu null sẽ dùng ItemDatabaseSO.Instance
+    
 
     public void Hide()
     {
@@ -29,6 +34,9 @@ public class ItemDetailsPanel : MonoBehaviour
             return;
         }
 
+    _current = item;
+    WireButtons();
+
         if (icon != null)
         {
             var sp = await Xianxia.Items.ItemAssets.LoadIconSpriteAsync(item.addressIcon);
@@ -39,6 +47,16 @@ public class ItemDetailsPanel : MonoBehaviour
         if (descText != null) descText.text = BuildDesc(item);
 
         gameObject.SetActive(true);
+    }
+
+    private InventoryItem _current;
+    private bool _wired;
+    private void WireButtons()
+    {
+        if (_wired) return;
+        if (useButton != null) useButton.onClick.AddListener(OnClickUse);
+        if (splitButton != null) splitButton.onClick.AddListener(OnClickSplit);
+        _wired = true;
     }
 
     // Tạo mô tả: cộng gộp chỉ số từ DB và từ InventoryItem (coi giá trị trong InventoryItem là delta)
@@ -141,6 +159,41 @@ public class ItemDetailsPanel : MonoBehaviour
         }
 
         return sb.ToString();
+    }
+
+    private void OnClickUse()
+    {
+        if (_current == null) return;
+        var inv = FindFirstObjectByType<PlayerInventory>();
+        if (inv == null) return;
+        // Mặc định dùng 1 đơn vị
+        inv.UseItem(_current, 1);
+        // Làm mới chi tiết và inventory
+        RefreshAfterAction(inv);
+    }
+
+    private void OnClickSplit()
+    {
+        if (_current == null) return;
+        int qty = 0;
+        if (splitQuantityInput != null)
+        {
+            int.TryParse(splitQuantityInput.text, out qty);
+        }
+        qty = Mathf.Clamp(qty, 1, _current.quantity - 1);
+        if (qty <= 0) return; // không thể tách nếu không đủ
+        var inv = FindFirstObjectByType<PlayerInventory>();
+        if (inv == null) return;
+        inv.SplitStack(_current, qty);
+        RefreshAfterAction(inv);
+    }
+
+    private void RefreshAfterAction(PlayerInventory inv)
+    {
+        var ui = FindFirstObjectByType<InventoryUIManager>();
+        ui?.RefreshFromCurrentData();
+        // Làm mới lại thông tin cho item (có thể đã thay đổi số lượng)
+        if (_current != null && _current.quantity > 0) Show(_current); else Hide();
     }
 
     private static void AppendLine(StringBuilder sb, string label, string value)

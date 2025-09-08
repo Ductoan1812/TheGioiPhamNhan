@@ -362,6 +362,36 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
+    // Kéo từ ô trang bị ra ngoài -> drop vật phẩm ra thế giới, không trả về túi
+    public bool DropEquippedItem(string equipSlot)
+    {
+        if (equipment == null) return false;
+        string slotId = equipSlot?.ToLowerInvariant();
+        equipment.TryGet(slotId, out var itm);
+        if (itm == null) return false;
+        // giữ nguyên trên slot cho tới khi drop thành công
+        var clone = CloneAsSingle(itm);
+        bool dropped = TryDropUnequipped(clone, slotId);
+        if (!dropped)
+        {
+            Debug.LogWarning("[PlayerInventory] Failed to drop equipped item; keeping it equipped.");
+            return false;
+        }
+        // Xoá khỏi slot trang bị sau khi đã drop
+        var removed = equipment.Unequip(slotId);
+        if (removed == null)
+        {
+            Debug.LogWarning("[PlayerInventory] DropEquippedItem: could not unequip after drop");
+        }
+        SaveInventory();
+        // làm mới UI/visual
+        var eqUi = FindFirstObjectByType<EquipmentUIManager>();
+        if (eqUi != null) eqUi.UpdateSlotUI(slotId, null);
+        var eqVisual = FindFirstObjectByType<Xianxia.Player.PlayerEquitment>();
+        if (eqVisual != null) eqVisual.RefreshSlotVisual(slotId, null);
+        return true;
+    }
+
     // Move or swap items between two equipment slots without modifying inventory stacks
     public bool MoveEquipment(string fromSlot, string toSlot)
     {
@@ -455,6 +485,76 @@ public class PlayerInventory : MonoBehaviour
         if (a == null || b == null) return false;
         return a.id == b.id;
     }
+
+    // Sử dụng vật phẩm tiêu hao: trừ số lượng và (TODO) áp dụng hiệu ứng
+    public bool UseItem(InventoryItem item, int quantity)
+    {
+        if (item == null || quantity <= 0) return false;
+        // Giảm từ đúng stack đang mở trong UI (theo Slot), nếu không có thì theo id
+        var slotEntry = inventory?.FirstOrDefault(x => x.Slot == item.Slot && IsSameItem(x, item));
+        if (slotEntry == null)
+            slotEntry = inventory?.FirstOrDefault(x => IsSameItem(x, item));
+        if (slotEntry == null || slotEntry.quantity <= 0) return false;
+
+        int remove = Mathf.Min(quantity, slotEntry.quantity);
+        slotEntry.quantity -= remove;
+        if (slotEntry.quantity <= 0)
+            inventory.Remove(slotEntry);
+
+        // TODO: Áp dụng useEffect của item (buff, heal...), hiện để trống
+        SaveInventory();
+
+        // Refresh UI
+        var invUi = FindFirstObjectByType<InventoryUIManager>();
+        invUi?.RefreshFromCurrentData();
+        return true;
+    }
+
+    // Tách stack: tạo một stack mới với số lượng chỉ định từ stack hiện tại
+    public bool SplitStack(InventoryItem item, int splitQuantity)
+    {
+        if (item == null || splitQuantity <= 0) return false;
+        var slotEntry = inventory?.FirstOrDefault(x => x.Slot == item.Slot && IsSameItem(x, item));
+        if (slotEntry == null)
+            slotEntry = inventory?.FirstOrDefault(x => IsSameItem(x, item));
+        if (slotEntry == null) return false;
+        if (splitQuantity >= slotEntry.quantity) return false; // phải chừa lại ít nhất 1
+
+        int empty = GetEmptySlot();
+        if (empty == -1)
+        {
+            Debug.LogWarning("[PlayerInventory] No empty slot to split stack");
+            return false;
+        }
+        slotEntry.quantity -= splitQuantity;
+        var newItem = new InventoryItem
+        {
+            id = slotEntry.id,
+            addressIcon = slotEntry.addressIcon,
+            addressTexture = slotEntry.addressTexture,
+            name = slotEntry.name,
+            category = slotEntry.category,
+            rarity = slotEntry.rarity,
+            element = slotEntry.element,
+            realmRequirement = slotEntry.realmRequirement,
+            bindType = slotEntry.bindType,
+            level = slotEntry.level,
+            maxStack = slotEntry.maxStack,
+            baseStats = slotEntry.baseStats,
+            sockets = slotEntry.sockets,
+            affixes = slotEntry.affixes,
+            useEffect = slotEntry.useEffect,
+            flavor = slotEntry.flavor,
+            quantity = splitQuantity,
+            Slot = empty,
+        };
+        inventory.Add(newItem);
+        SaveInventory();
+
+        var invUi = FindFirstObjectByType<InventoryUIManager>();
+        invUi?.RefreshFromCurrentData();
+        return true;
+    }
     public int GetEmptySlot()
     {
         int capacity = maxSlots > 0 ? maxSlots : Math.Max(1, PlayerManager.Instance?.Data?.InventorySize ?? 0);
@@ -514,6 +614,44 @@ public class PlayerInventory : MonoBehaviour
         var dropItem = CloneAsSingle(item);
         dropMgr.Spawn(dropItem, pos + Vector3.right * 0.5f);
         Debug.Log($"[PlayerInventory] Dropped unequipped item {item.id} from {fromSlot} at {pos}");
+        return true;
+    }
+
+    // Kéo item từ inventory ra ngoài -> drop ra thế giới và trừ số lượng trong túi
+    public bool DropItemFromInventory(InventoryItem item, int quantity, int sourceSlotIndex)
+    {
+        if (item == null || quantity <= 0) return false;
+        if (inventory == null || inventory.Count == 0) return false;
+
+        // Tìm đúng entry tại slot chỉ định nếu có, để trừ chính xác
+        InventoryItem slotEntry = inventory.FirstOrDefault(x => x.Slot == sourceSlotIndex && HasRealItem(x));
+        if (slotEntry == null)
+        {
+            // fallback: tìm theo id nếu không có entry đúng index (phòng khi UI chưa sync)
+            slotEntry = inventory.FirstOrDefault(x => IsSameItem(x, item) && HasRealItem(x));
+        }
+        if (slotEntry == null) return false;
+
+        int remove = Mathf.Min(quantity, slotEntry.quantity);
+        // Tạo bản sao x1 để drop (nếu remove > 1, thả nhiều lần hoặc gom quantity tùy ItemDropManager)
+        for (int i = 0; i < remove; i++)
+        {
+            var one = CloneAsSingle(slotEntry);
+            // dùng fromSlot = $"inv:{sourceSlotIndex}" để log
+            TryDropUnequipped(one, $"inv:{sourceSlotIndex}");
+        }
+
+        slotEntry.quantity -= remove;
+        if (slotEntry.quantity <= 0)
+        {
+            // xóa entry khỏi inventory
+            inventory.Remove(slotEntry);
+        }
+        SaveInventory();
+
+        // Cập nhật UI inventory sau khi thay đổi
+        var invUi = FindFirstObjectByType<InventoryUIManager>();
+        if (invUi != null) invUi.RefreshFromCurrentData();
         return true;
     }
 }

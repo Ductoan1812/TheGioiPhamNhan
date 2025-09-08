@@ -1,6 +1,9 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 using Xianxia.PlayerDataSystem;
 
 /// Quản lý logic kéo/thả giữa các SlotItem: gộp stack, hoán đổi, di chuyển.
@@ -75,6 +78,12 @@ public class InventoryUIManager : MonoBehaviour
             slot.slotIndex = i;
             slot.SetItem(null);
             slot.onDropOnThis.AddListener(OnDropOnSlot);
+            // Nếu kéo ra ngoài, drop xuống thế giới
+            slot.DroppedOutside += HandleDropOutsideFromInventory;
+            // Khi bắt đầu kéo: mở Inventory + Equipment
+            slot.BeganDrag += _ => UIManager.Instance?.ShowInventoryAndEquipment();
+            // Khi click: mở Inventory + InfoItem (và đổ thông tin)
+            slot.Clicked += HandleSlotClicked;
             slots.Add(slot);
         }
     }
@@ -174,5 +183,64 @@ public class InventoryUIManager : MonoBehaviour
     private void Save()
     {
         playerInventory?.SendMessage("SaveInventory", SendMessageOptions.DontRequireReceiver);
+    }
+
+    // Khi kéo một ô từ inventory và thả ra ngoài mọi Slot -> drop item ra thế giới
+    private void HandleDropOutsideFromInventory(SlotItem source)
+    {
+        if (source == null) return;
+        var item = source.CurrentItem;
+        if (item == null || item.quantity <= 0) return;
+        // Chỉ xử lý nếu thực sự là slot inventory (có chỉ số slot hợp lệ)
+        if (source.slotIndex < 0) return;
+        // Nếu con trỏ vẫn đang nằm trong vùng lưới inventory -> không drop (thả vào khoảng trống)
+        if (IsPointerOverInventoryArea())
+        {
+            return;
+        }
+        if (playerInventory == null) playerInventory = FindFirstObjectByType<PlayerInventory>();
+    // Thả toàn bộ stack hiện tại
+    playerInventory?.DropItemFromInventory(item, item.quantity, source.slotIndex);
+        // UI sẽ được PlayerInventory cập nhật/Save tự xử lý
+    }
+
+    private bool IsPointerOverInventoryArea()
+    {
+        if (gridRoot == null) return false;
+        var rect = gridRoot as RectTransform;
+        if (rect == null) return false;
+        var canvas = gridRoot.GetComponentInParent<Canvas>();
+        Camera cam = null;
+        if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            cam = canvas.worldCamera;
+        Vector2 screenPos = GetScreenPointerPosition();
+        return RectTransformUtility.RectangleContainsScreenPoint(rect, screenPos, cam);
+    }
+
+    private Vector2 GetScreenPointerPosition()
+    {
+#if ENABLE_INPUT_SYSTEM
+        if (Mouse.current != null)
+        {
+            return Mouse.current.position.ReadValue();
+        }
+        return Vector2.zero;
+#else
+        return Input.mousePosition;
+#endif
+    }
+
+    private void HandleSlotClicked(SlotItem source)
+    {
+        if (source == null) return;
+        var item = source.CurrentItem;
+        if (item == null || item.quantity <= 0) return;
+        UIManager.Instance?.ShowInventoryAndInfoItem();
+        // Tìm panel chi tiết và hiển thị
+        var details = FindFirstObjectByType<ItemDetailsPanel>(FindObjectsInactive.Include);
+        if (details != null)
+        {
+            details.Show(item);
+        }
     }
 }
