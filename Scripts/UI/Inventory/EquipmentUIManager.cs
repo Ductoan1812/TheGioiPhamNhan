@@ -12,6 +12,7 @@ public class EquipmentUIManager : MonoBehaviour
     {
         public string equipSlotName;
         public SlotItem slotItem;
+        public Sprite defaultIcon; 
     }
 
     public UnityEvent onStatsLoaded;
@@ -133,7 +134,7 @@ public class EquipmentUIManager : MonoBehaviour
 
         if (item == null)
         {
-            slot.slotItem.Clear();
+            slot.slotItem.iconImage.sprite = slot.defaultIcon;
             return;
         }
 
@@ -196,6 +197,7 @@ public class EquipmentUIManager : MonoBehaviour
             return;
         }
         PlayerInventory.Instance.UnEquipItem(slotId);
+        UpdateSlotUI(slotId, null);
     }
 
     private IEnumerator ShowEquipNextFrame()
@@ -220,5 +222,6 @@ public class EquipmentUIManager : MonoBehaviour
             return;
         }
         PlayerInventory.Instance.DropEquippedItem(slotId);
+        UpdateSlotUI(slotId, null);
     }
 }

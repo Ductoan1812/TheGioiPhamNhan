@@ -233,7 +233,7 @@ namespace Xianxia.PlayerDataSystem
             }
 
             // Danh sách slot mặc định (tùy chỉnh theo game)
-            string[] defaultSlots = { "weapon_l","weapon_r","armor","cloth","helmet","ring_r","ring_l","foot","body","pet" };
+            string[] defaultSlots = { "weapon_l","weapon_r","armor","cloth","helmet","ring_r","ring_l","foot","body","pet","back" };
             data.equipment.EnsureSlots(defaultSlots);
 
             return data;

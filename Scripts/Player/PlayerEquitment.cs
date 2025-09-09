@@ -102,6 +102,7 @@ namespace Xianxia.Player
                 case "foot":     return playerRenderer.foot;
                 case "body":     return playerRenderer.body;
                 case "pet":      return playerRenderer.pet;
+                case "back":     return playerRenderer.back;
                 default: return null;
             }
         }

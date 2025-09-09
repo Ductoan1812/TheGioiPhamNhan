@@ -9,7 +9,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -53,7 +52,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -97,7 +95,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -141,7 +138,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -185,7 +181,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -229,7 +224,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -273,7 +267,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 30,
             "baseStats": {
                 "atk": 0.0,
@@ -317,7 +310,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -361,7 +353,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -405,7 +396,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -449,7 +439,6 @@
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,
@@ -487,13 +476,12 @@
         {
             "id": "back1",
             "name": "back",
-            "category": "pet",
+            "category": "back",
             "rarity": "pham",
             "element": "none",
             "realmRequirement": "none",
             "bindType": "none",
             "level": 1,
-            "stackSize": 1,
             "maxStack": 1,
             "baseStats": {
                 "atk": 0.0,

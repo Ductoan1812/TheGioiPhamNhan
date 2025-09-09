@@ -26,12 +26,13 @@ namespace Xianxia.Player
         public SlotRendererGroup[] foot;
         public SlotRendererGroup[] body;
         public SlotRendererGroup[] pet;
+        public SlotRendererGroup[] back;
 
         /// <summary>
         /// Gán sprite cho tất cả renderer trong một nhóm slot, truyền vào mảng group và addressTexture
         /// </summary>
 
-       public async System.Threading.Tasks.Task SetSlotSprites(SlotRendererGroup[] group, string addressTexture)
+        public async System.Threading.Tasks.Task SetSlotSprites(SlotRendererGroup[] group, string addressTexture)
         {
             if (group == null || group.Length == 0) return;
             foreach (var slot in group)
