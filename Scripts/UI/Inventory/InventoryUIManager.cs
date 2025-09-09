@@ -4,6 +4,7 @@ using UnityEngine;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
+using System.Collections;
 using Xianxia.PlayerDataSystem;
 
 /// Quản lý logic kéo/thả giữa các SlotItem: gộp stack, hoán đổi, di chuyển.
@@ -80,8 +81,8 @@ public class InventoryUIManager : MonoBehaviour
             slot.onDropOnThis.AddListener(OnDropOnSlot);
             // Nếu kéo ra ngoài, drop xuống thế giới
             slot.DroppedOutside += HandleDropOutsideFromInventory;
-            // Khi bắt đầu kéo: mở Inventory + Equipment
-            slot.BeganDrag += _ => UIManager.Instance?.ShowInventoryAndEquipment();
+            // Khi bắt đầu kéo: mở Inventory + Equipment (trì hoãn 1 frame để không cắt đứt sự kiện kéo)
+            slot.BeganDrag += _ => StartCoroutine(ShowEquipNextFrame());
             // Khi click: mở Inventory + InfoItem (và đổ thông tin)
             slot.Clicked += HandleSlotClicked;
             slots.Add(slot);
@@ -228,6 +229,12 @@ public class InventoryUIManager : MonoBehaviour
 #else
         return Input.mousePosition;
 #endif
+    }
+
+    private IEnumerator ShowEquipNextFrame()
+    {
+        yield return null; // đợi hết frame hiện tại để tránh gián đoạn drag
+        UIManager.Instance?.ShowInventoryAndEquipment();
     }
 
     private void HandleSlotClicked(SlotItem source)

@@ -64,6 +64,7 @@ public class UIManager : MonoBehaviour
 
         // Mở tab mặc định = Inventory
         SwitchState(0);
+        ShowInventoryAndEquipment();
     RefreshInventoryUI();
     }
 
@@ -100,9 +101,7 @@ public class UIManager : MonoBehaviour
         if (equipmentPanel != null) equipmentPanel.SetActive(true);
         if (infoItemPanel != null) infoItemPanel.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
-
-    RefreshInventoryUI();
-    RefreshEquipmentUI();
+    // Không refresh khi đang kéo để tránh rebuild làm hỏng thao tác drag
     }
 
     // Hiển thị Inventory + InfoItem
@@ -117,8 +116,7 @@ public class UIManager : MonoBehaviour
         if (equipmentPanel != null) equipmentPanel.SetActive(false);
         if (infoItemPanel != null) infoItemPanel.SetActive(true);
         if (settingsPanel != null) settingsPanel.SetActive(false);
-
-        RefreshInventoryUI();
+    // Không refresh ở đây để tránh rebuild vào lúc click/drag. Inventory đã được refresh khi mở menu hoặc đổi tab.
     }
 
     private void RefreshInventoryUI()

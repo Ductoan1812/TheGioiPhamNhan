@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.Events;
 using Xianxia.PlayerDataSystem;
 using Xianxia.Items;
+using System.Collections;
 
 public class EquipmentUIManager : MonoBehaviour
 {
@@ -89,7 +90,7 @@ public class EquipmentUIManager : MonoBehaviour
                 s.slotItem.DroppedOnThis += HandleDroppedOnEquipSlot;
                 s.slotItem.DoubleClicked += HandleEquipSlotDoubleClick;
                 s.slotItem.DroppedOutside += HandleEquipSlotDropOutside;
-                s.slotItem.BeganDrag += _ => UIManager.Instance?.ShowInventoryAndEquipment();
+                s.slotItem.BeganDrag += _ => StartCoroutine(ShowEquipNextFrame());
             }
         }
     }
@@ -195,6 +196,12 @@ public class EquipmentUIManager : MonoBehaviour
             return;
         }
         PlayerInventory.Instance.UnEquipItem(slotId);
+    }
+
+    private IEnumerator ShowEquipNextFrame()
+    {
+        yield return null;
+        UIManager.Instance?.ShowInventoryAndEquipment();
     }
 
     // Kéo từ ô trang bị ra ngoài -> drop vật phẩm ra thế giới (không trả về túi)
