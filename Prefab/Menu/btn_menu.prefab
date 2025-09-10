@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 4391000120956927404}
   - component: {fileID: 2181401996467178394}
   - component: {fileID: 2618690411248489718}
-  - component: {fileID: 5397836332554434711}
+  - component: {fileID: 1507218491767487908}
+  - component: {fileID: -7069778818277627665}
   m_Layer: 5
   m_Name: btn_menu
   m_TagString: Untagged
@@ -77,7 +78,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &5397836332554434711
+--- !u!114 &1507218491767487908
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -86,9 +87,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4119310154371686620}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Script: {fileID: 11500000, guid: 9085046f02f69544eb97fd06b6048fe2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Toggle
   m_Navigation:
     m_Mode: 3
     m_WrapAround: 0
@@ -118,9 +119,29 @@ MonoBehaviour:
     m_DisabledTrigger: Disabled
   m_Interactable: 1
   m_TargetGraphic: {fileID: 2618690411248489718}
-  m_OnClick:
+  toggleTransition: 1
+  graphic: {fileID: 0}
+  m_Group: {fileID: 0}
+  onValueChanged:
     m_PersistentCalls:
       m_Calls: []
+  m_IsOn: 0
+--- !u!114 &-7069778818277627665
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4119310154371686620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66d00546d9c0ba142b6feab82268a04f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TabShiftToggle
+  target: {fileID: 0}
+  downOffset: 6
+  animTime: 0.08
+  snapToInt: 1
 --- !u!1 &4249795184714742329
 GameObject:
   m_ObjectHideFlags: 0
