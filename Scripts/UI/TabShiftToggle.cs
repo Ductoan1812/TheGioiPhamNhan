@@ -10,7 +10,7 @@ public class TabShiftToggle : MonoBehaviour
     public RectTransform target;
 
     [Tooltip("Dịch xuống bao nhiêu pixel khi tab được chọn (dương = xuống).")]
-    public float downOffset = 6f;
+    public float downOffset = 20f;
 
     [Tooltip("Thời gian animate (giây). 0 = đổi ngay.")]
     public float animTime = 0.08f;

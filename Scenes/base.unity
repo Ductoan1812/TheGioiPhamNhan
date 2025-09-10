@@ -3239,9 +3239,18 @@ MonoBehaviour:
   inventoryPanel: {fileID: 827067716}
   equipmentPanel: {fileID: 1418423832}
   infoItemPanel: {fileID: 1594205995}
+  infoPlayerPanel: {fileID: 0}
+  skillPanel: {fileID: 0}
+  questPanel: {fileID: 0}
+  mapPanel: {fileID: 0}
+  creatingPanel: {fileID: 0}
+  achievementPanel: {fileID: 0}
+  socialPanel: {fileID: 0}
+  petPanel: {fileID: 0}
   settingsPanel: {fileID: 0}
   openButton: {fileID: 1473390916}
   exitButton: {fileID: 1757276661}
+  otherTogglePanels: []
 --- !u!1 &231653627
 GameObject:
   m_ObjectHideFlags: 0
@@ -28096,7 +28105,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 7090449356068617470, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
+  m_Sprite: {fileID: -5412707236820924342, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -28153,8 +28162,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 265.50772, y: 15.100006}
-  m_SizeDelta: {x: 309.8245, y: 83.3958}
+  m_AnchoredPosition: {x: 267.06595, y: 20.277008}
+  m_SizeDelta: {x: 312.9319, y: 44.247}
   m_Pivot: {x: 0.5, y: -0.000000040978193}
 --- !u!114 &851406080
 MonoBehaviour:
@@ -28176,12 +28185,12 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -654096351, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
+  m_Sprite: {fileID: -4160919261030202443, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
-  m_FillMethod: 1
-  m_FillAmount: 0.5
+  m_FillMethod: 0
+  m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -30110,7 +30119,7 @@ GameObject:
   - component: {fileID: 1330392796}
   - component: {fileID: 1330392795}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: HealthBar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30155,7 +30164,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 8136285655867910230, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
+  m_Sprite: {fileID: 4171116140284340875, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -71142,7 +71151,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 904661037887828610, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
+  m_Sprite: {fileID: 7090449356068617470, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -72641,7 +72650,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1694044740
 RectTransform:
   m_ObjectHideFlags: 0
@@ -72689,7 +72698,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 4171116140284340875, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
+  m_Sprite: {fileID: 904661037887828610, guid: e3524b83f34a1d54ab11d77f46d56792, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -72928,7 +72937,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1733857014
 RectTransform:
   m_ObjectHideFlags: 0

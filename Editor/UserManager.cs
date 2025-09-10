@@ -18,7 +18,7 @@ public class UserManager : EditorWindow
     private Vector2 rightScroll;
 
     private List<string> jsonFiles = new List<string>();
-    private int selectedIndex = -1;
+
     private string selectedPath = null;
     private string jsonText = "";
     private bool dirty = false;

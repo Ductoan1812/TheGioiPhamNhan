@@ -273,6 +273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SlotItem
   iconImage: {fileID: 4733965763115038549}
   quantityText: {fileID: 2628299938799779966}
+  itemDB: {fileID: 11400000, guid: e1dc69d3eb0c09a45a33bebcfa7218d7, type: 2}
   slotIndex: -1
   onClick:
     m_PersistentCalls:
@@ -305,6 +306,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onPointerExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onDropOutside:
     m_PersistentCalls:
       m_Calls: []
   doubleClickThreshold: 0.25
