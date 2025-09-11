@@ -16,7 +16,6 @@ namespace Xianxia.PlayerDataSystem
         public float xp; // kinh nghiệm hiện tại
         public float qiMax; // mana tối đa
         public float qi; // mana hiện tại
-
         public float atk; // sát thương
         public float def; // phòng thủ
         public float critRate; // tỷ lệ chí mạng

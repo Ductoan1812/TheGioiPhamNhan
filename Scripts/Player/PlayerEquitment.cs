@@ -14,6 +14,7 @@ namespace Xianxia.Player
         public UnityEvent onStatsLoaded;
         public ItemDatabaseSO ItemDatabase;
         public PlayerRenderer playerRenderer;
+        private PlayerStatsManager statsManager;
 
 
         private EquipmentData Equipment;
@@ -42,9 +43,25 @@ namespace Xianxia.Player
         private void OnPlayerDataLoaded(PlayerData data)
         {
             Equipment = data?.equipment;
+            statsManager = GetComponent<PlayerStatsManager>();
+            if (Equipment != null)
+            {
+                Equipment.OnEquipped += OnEquipmentChanged;
+                Equipment.OnUnequipped += OnEquipmentChanged;
+            }
             ApplyToPlayerData();
+            statsManager?.RecalculateEquipmentStats(data);
+            statsManager?.RecalculateAll(data);
             onStatsLoaded?.Invoke();
             Debug.Log($"[PlayerEquitment] Loaded equipment for {data.id}");
+            
+        }
+        private void OnEquipmentChanged(string slotId, InventoryItem item)
+        {
+            var data = PlayerManager.Instance?.Data;
+            statsManager?.RecalculateEquipmentStats(data);
+            statsManager?.RecalculateAll(data);
+            RefreshSlotVisual(slotId, item);
         }
         // hàm gán trang bị lên nhân vật khi có trang bị thay đổi, 
         public void ApplyToPlayerData(bool save = true)

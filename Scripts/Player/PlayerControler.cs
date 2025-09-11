@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerControler : MonoBehaviour
 {
     public float moveSpeed = 6f; 
-    private PlayerStats stats;
+    private PlayerStatsManager stats;
     private PlayerInput playerInput;
     private Rigidbody2D rb;
 
@@ -13,7 +13,7 @@ public class PlayerControler : MonoBehaviour
     {
     playerInput = GetComponent<PlayerInput>();
         rb = GetComponent<Rigidbody2D>();
-    stats = GetComponent<PlayerStats>();
+    stats = GetComponent<PlayerStatsManager>();
     }
 
     void FixedUpdate()
@@ -23,7 +23,7 @@ public class PlayerControler : MonoBehaviour
         if (input.x > 0) transform.localScale = new Vector3(-1, 1, 1);
         else if (input.x < 0) transform.localScale = new Vector3(1, 1, 1);
 
-        float speed = stats ? stats.MoveSpd : moveSpeed;
+        float speed = stats ? stats.StatsCurrentData.moveSpd : moveSpeed;
         Vector2 velocity = new Vector2(input.x, input.y) * speed;
         rb.linearVelocity = velocity;
     }

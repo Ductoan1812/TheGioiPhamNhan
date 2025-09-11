@@ -47,7 +47,7 @@ public class EnemyAttack : MonoBehaviour
             enemyAnim.attackAnimation();
         }
         // Áp dụng sát thương lên Player nếu có PlayerStats
-        var playerStats = target.GetComponent<PlayerStats>();
+        var playerStats = target.GetComponent<PlayerStatsManager>();
         if (playerStats != null)
         {
            // playerStats.TakeDamage(damage);
