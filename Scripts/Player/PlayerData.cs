@@ -10,6 +10,7 @@ namespace Xianxia.PlayerDataSystem
     [Serializable]
     public class PlayerStats
     {
+        public int pors; // điểm tu luyện
         public float hpMax; // máu tối đa
         public float hp; // máu hiện tại
         public float xpMax; // kinh nghiệm tối đa
