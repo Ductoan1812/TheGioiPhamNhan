@@ -6,12 +6,24 @@ using Xianxia.PlayerDataSystem;
 public class PlayerStats : MonoBehaviour
 {
     [Header("Runtime stats")]
+    [SerializeField] private float hpMax;
     [SerializeField] private float hp;
+    [SerializeField] private float xpMax;
+    [SerializeField] private float xp;
+    [SerializeField] private float qiMax;
     [SerializeField] private float qi;
     [SerializeField] private float atk;
     [SerializeField] private float def;
     [SerializeField] private float critRate;
+    [SerializeField] private float critDmg;
     [SerializeField] private float moveSpd;
+    [SerializeField] private float hpRegen;
+    [SerializeField] private float qiRegen;
+    [SerializeField] private float lifesteal;
+    [SerializeField] private float spellPower;
+    [SerializeField] private float spellResist;
+    [SerializeField] private float dodge;
+    [SerializeField] private float pierce;
 
     public UnityEvent onStatsLoaded;
 
