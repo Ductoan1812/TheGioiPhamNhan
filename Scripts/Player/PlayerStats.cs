@@ -34,16 +34,31 @@ public class PlayerStats : MonoBehaviour
     public float Def { get => def; set => def = value; }
     public float CritRate { get => critRate; set => critRate = value; }
     public float MoveSpd { get => moveSpd; set => moveSpd = value; }
-	// set bonus chỉ số tạm thời (từ trang bị, buff, skill...)
-	public void SetTemporaryBonus(float hpBonus, float qiBonus, float atkBonus, float defBonus, float critRateBonus, float moveSpdBonus)
-	{
-		hp += hpBonus;
-		qi += qiBonus;
-		atk += atkBonus;
-		def += defBonus;
-		critRate += critRateBonus;
-		moveSpd += moveSpdBonus;
-	}
+    public float HpRegen { get => hpRegen; set => hpRegen = value; }
+    public float QiRegen { get => qiRegen; set => qiRegen = value; }
+    public float Lifesteal { get => lifesteal; set => lifesteal = value; }
+    public float SpellPower { get => spellPower; set => spellPower = value; }
+    public float SpellResist { get => spellResist; set => spellResist = value; }
+    public float Dodge { get => dodge; set => dodge = value; }
+    public float Pierce { get => pierce; set => pierce = value; }
+    public float HpMax { get => hpMax; set => hpMax = value; }
+    public float QiMax { get => qiMax; set => qiMax = value; }
+    public float XpMax { get => xpMax; set => xpMax = value; }
+    public float Xp { get => xp; set => xp = value; }
+    public float CritDmg { get => critDmg; set => critDmg = value; }
+
+
+    // set bonus chỉ số tạm thời (từ trang bị, buff, skill...)
+    public void SetTemporaryBonus(float hpBonus, float qiBonus, float atkBonus, float defBonus, float critRateBonus, float moveSpdBonus)
+    {
+        hp += hpBonus;
+        qi += qiBonus;
+        atk += atkBonus;
+        def += defBonus;
+        critRate += critRateBonus;
+        moveSpd += moveSpdBonus;
+        
+    }
 
     private void OnEnable()
 	{
@@ -78,6 +93,13 @@ public class PlayerStats : MonoBehaviour
         def = s.def;
         critRate = s.critRate;
         moveSpd = s.moveSpd;
+        hpRegen = s.hpRegen;
+        qiRegen = s.qiRegen;
+        lifesteal = s.lifesteal;
+        spellPower = s.spellPower;
+        spellResist = s.spellResist;
+        dodge = s.dodge;
+        pierce = s.pierce;
 
         onStatsLoaded?.Invoke();
         Debug.Log($"[PlayerStats] Loaded stats for {data.id}");
@@ -96,10 +118,19 @@ public class PlayerStats : MonoBehaviour
 		data.stats.def = def;
 		data.stats.critRate = critRate;
 		data.stats.moveSpd = moveSpd;
+        data.stats.hpRegen = hpRegen;
+        data.stats.qiRegen = qiRegen;
+        data.stats.lifesteal = lifesteal;
+        data.stats.spellPower = spellPower;
+        data.stats.spellResist = spellResist;
+        data.stats.dodge = dodge;
+        data.stats.pierce = pierce;
+
+        Debug.Log($"[PlayerStats] Applied stats to PlayerData for {data.id}");
 
 		if (save)
-		{
-			PlayerManager.Instance.SavePlayer();
-		}
+        {
+            PlayerManager.Instance.SavePlayer();
+        }
 	}
 }
