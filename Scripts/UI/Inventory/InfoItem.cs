@@ -7,7 +7,7 @@ using Xianxia.PlayerDataSystem;
 using Xianxia.Items;
 
 /// Panel hiển thị thông tin item khi click SlotItem.
-public class ItemDetailsPanel : MonoBehaviour
+public class InfoItem : MonoBehaviour
 {
     [Header("UI")]
     public Image icon;
@@ -71,28 +71,20 @@ public class ItemDetailsPanel : MonoBehaviour
         // 1) Thông tin chung (trừ ID/Name)
     if (def != null)
         {
-            AppendLine(sb, "Loại", def.category.ToString());
             AppendLine(sb, "Phẩm chất", def.rarity.ToString());
             AppendLine(sb, "Ngũ hành", def.element.ToString());
-            AppendLine(sb, "Cảnh giới yêu cầu", def.realmRequirement.ToString());
-            AppendLine(sb, "Ràng buộc", def.bindType.ToString());
+            AppendLine(sb, "yêu cầu", def.realmRequirement.ToString());
             AppendInt(sb, "Cấp", def.level, inv.level, deltaColor);
-            // Stack & số lượng
-            if (def.maxStack > 0)
-                AppendLine(sb, "Stack tối đa", def.maxStack.ToString());
-            if (inv.quantity > 0)
-        AppendLine(sb, "Số lượng", inv.quantity.ToString());
-
             // Base stats chính
-        AppendStat(sb, "Tấn công", def.baseStats.atk, inv.baseStats.atk, deltaColor);
-        AppendStat(sb, "Phòng thủ", def.baseStats.defense, inv.baseStats.defense, deltaColor);
-        AppendStat(sb, "Sinh lực", def.baseStats.hp, inv.baseStats.hp, deltaColor);
-        AppendStat(sb, "Khí", def.baseStats.qi, inv.baseStats.qi, deltaColor);
-        AppendStat(sb, "Tốc độ di chuyển", def.baseStats.moveSpd, inv.baseStats.moveSpd, deltaColor);
-        AppendPercentStat(sb, "Tỉ lệ chí mạng", def.baseStats.critRate, inv.baseStats.critRate, deltaColor);
-        AppendPercentStat(sb, "Sát thương chí mạng", def.baseStats.critDmg, inv.baseStats.critDmg, deltaColor);
-        AppendStat(sb, "Xuyên giáp", def.baseStats.penetration, inv.baseStats.penetration, deltaColor);
-        AppendStat(sb, "Hút khí", def.baseStats.lifestealQi, inv.baseStats.lifestealQi, deltaColor);
+            AppendStat(sb, "Tấn công", def.baseStats.atk, inv.baseStats.atk, deltaColor);
+            AppendStat(sb, "Phòng thủ", def.baseStats.defense, inv.baseStats.defense, deltaColor);
+            AppendStat(sb, "Sinh lực", def.baseStats.hp, inv.baseStats.hp, deltaColor);
+            AppendStat(sb, "Khí", def.baseStats.qi, inv.baseStats.qi, deltaColor);
+            AppendStat(sb, "Tốc độ di chuyển", def.baseStats.moveSpd, inv.baseStats.moveSpd, deltaColor);
+            AppendPercentStat(sb, "Tỉ lệ chí mạng", def.baseStats.critRate, inv.baseStats.critRate, deltaColor);
+            AppendPercentStat(sb, "Sát thương chí mạng", def.baseStats.critDmg, inv.baseStats.critDmg, deltaColor);
+            AppendStat(sb, "Xuyên giáp", def.baseStats.penetration, inv.baseStats.penetration, deltaColor);
+            AppendStat(sb, "Hút khí", def.baseStats.lifestealQi, inv.baseStats.lifestealQi, deltaColor);
 
             // Kháng (resist)
             if (def.baseStats.res != null && inv.baseStats.res != null)
@@ -109,13 +101,11 @@ public class ItemDetailsPanel : MonoBehaviour
 
             // Sockets
             AppendInt(sb, "Sockets", def.sockets, inv.sockets, deltaColor);
-
             // Phụ tố/Affix
             if (def.affixes != null && def.affixes.Length > 0)
                 AppendLine(sb, "Phụ tố", FormatAffixes(def.affixes));
             if (inv.affixes != null && inv.affixes.Length > 0)
                 AppendLine(sb, "Phụ tố (bổ sung)", FormatAffixes(inv.affixes));
-
             // Hiệu ứng dùng
             if (def.useEffect != null && !string.IsNullOrEmpty(def.useEffect.type))
             {
@@ -127,28 +117,10 @@ public class ItemDetailsPanel : MonoBehaviour
                 if (!string.IsNullOrEmpty(ue.spellId)) ueText.Append($", spell: {ue.spellId}");
                 AppendLine(sb, "Hiệu ứng dùng", ueText.ToString());
             }
-
-            // Tài nguyên (địa chỉ Addressables)
-            if (!string.IsNullOrEmpty(def.addressIcon))
-                AppendLine(sb, "Icon", def.addressIcon);
-            if (!string.IsNullOrEmpty(def.addressTexture))
-                AppendLine(sb, "Texture", def.addressTexture);
         }
         else
         {
-            // Không có DB -> hiển thị thẳng theo InventoryItem như total, và (delta=0)
-            AppendStatOnly(sb, "Tấn công", inv.baseStats.atk);
-            AppendStatOnly(sb, "Phòng thủ", inv.baseStats.defense);
-            AppendStatOnly(sb, "Sinh lực", inv.baseStats.hp);
-            AppendStatOnly(sb, "Khí", inv.baseStats.qi);
-            AppendStatOnly(sb, "Tốc độ di chuyển", inv.baseStats.moveSpd);
-            AppendPercentOnly(sb, "Tỉ lệ chí mạng", inv.baseStats.critRate);
-            AppendPercentOnly(sb, "Sát thương chí mạng", inv.baseStats.critDmg);
-            AppendStatOnly(sb, "Xuyên giáp", inv.baseStats.penetration);
-            AppendStatOnly(sb, "Hút khí", inv.baseStats.lifestealQi);
-            AppendLine(sb, "Sockets", inv.sockets.ToString());
-            if (inv.affixes != null && inv.affixes.Length > 0)
-                AppendLine(sb, "Phụ tố", FormatAffixes(inv.affixes));
+            sb.Append("(Không tìm thấy dữ liệu gốc từ ItemDatabase)");
         }
 
         // Thêm flavor/desc ở cuối nếu có

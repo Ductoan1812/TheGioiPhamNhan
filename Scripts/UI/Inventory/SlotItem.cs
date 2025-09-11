@@ -238,7 +238,8 @@ public class SlotItem : MonoBehaviour,
     //=================== Kéo/Thả ===================
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (currentItem == null || currentItem.quantity <= 0) return;
+        Debug.Log($"[SlotItem] OnBeginDrag {this} item={currentItem}");
+        if (currentItem == null || currentItem.quantity <= 0) return;   
 
         s_dragSource = this;
     s_dropOccurred = false;
@@ -304,6 +305,7 @@ public class SlotItem : MonoBehaviour,
 
         if (s_dragCanvas == null)
         {
+            Debug.Log("[SlotItem]Find drag canvas");
             var c = GetComponentInParent<Canvas>();
             s_dragCanvas = c != null ? c.rootCanvas : null;
         }

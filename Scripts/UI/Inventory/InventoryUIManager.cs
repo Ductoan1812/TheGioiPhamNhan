@@ -244,7 +244,7 @@ public class InventoryUIManager : MonoBehaviour
         if (item == null || item.quantity <= 0) return;
         UIManager.Instance?.ShowInventoryAndInfoItem();
         // Tìm panel chi tiết và hiển thị
-        var details = FindFirstObjectByType<ItemDetailsPanel>(FindObjectsInactive.Include);
+        var details = FindFirstObjectByType<InfoItem>(FindObjectsInactive.Include);
         if (details != null)
         {
             details.Show(item);

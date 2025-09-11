@@ -10,12 +10,29 @@ namespace Xianxia.PlayerDataSystem
     [Serializable]
     public class PlayerStats
     {
-        public float hp;
-        public float qi;
-        public float atk;
-        public float def;
-        public float critRate;
-        public float moveSpd;
+        public float hpMax; // máu tối đa
+        public float hp; // máu hiện tại
+        public float xpMax; // kinh nghiệm tối đa
+        public float xp; // kinh nghiệm hiện tại
+        public float qiMax; // mana tối đa
+        public float qi; // mana hiện tại
+
+        public float atk; // sát thương
+        public float def; // phòng thủ
+        public float critRate; // tỷ lệ chí mạng
+        public float critDmg; // sát thương chí mạng
+        public float moveSpd; // tốc độ di chuyển
+        public float hpRegen; // hồi phục máu
+        public float qiRegen; // hồi phục mana
+        public float lifesteal; // hút máu
+        public float spellPower; // sức mạnh phép thuật
+        public float spellResist; // kháng phép
+        public float dodge; // né tránh
+        public float pierce; // xuyên thấu
+        public float block; // chặn
+        public float blockRate; // tỷ lệ chặn
+        public float luck; // vận may   
+        public float InventorySize; // kích thước kho đồ
     }
     [Serializable]
     public class InventoryItem : ItemData
@@ -156,9 +173,7 @@ namespace Xianxia.PlayerDataSystem
         public string id = "User_001123";
         public string name = "Đức Toàn";
         public int level = 1;
-        public int exp = 0;
         public string realm = "truc_co";
-
         public int InventorySize = 30;
 
         public PlayerStats stats = new PlayerStats();
