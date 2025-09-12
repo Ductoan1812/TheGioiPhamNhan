@@ -1,10 +1,5 @@
-using Unity.AppUI.UI;
 using UnityEngine;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
-#endif
-// using System.Linq; // not needed with event-driven toggles
+// Mỗi toggle đã có script riêng (MenuToggleKey). Ta chỉ cần map key -> panel ở đây.
 
 public class UIManager : MonoBehaviour
 {
@@ -16,7 +11,7 @@ public class UIManager : MonoBehaviour
     public GameObject inventoryPanel;
     public GameObject equipmentPanel;
     public GameObject infoItemPanel;
-    public GameObject infoPlayerPanel;
+    public GameObject infoPlayerPanel;  // bổ sung các panel khác sử dụng
     public GameObject skillPanel;
     public GameObject questPanel;
     public GameObject mapPanel;
@@ -29,21 +24,17 @@ public class UIManager : MonoBehaviour
     [Header("Buttons")]
     public GameObject openButton;   // Nút mở menu
     public GameObject exitButton;   // Nút thoát menu
-    [Header("toggle")]
-    public ToggleButtonGroup toggleButtonGroup; // Không dùng API runtime; dùng sự kiện UI gọi OnToggleSelected
-
     [System.Serializable]
-    public class ToggleKeyPanel
+    public class PanelMapping
     {
-        [Tooltip("Khóa định danh do Toggle truyền vào (ví dụ: 'Skills', 'Quests', 'Map', ...)")]
-        public string key;
-        public GameObject panel;
+        public string key;           // Khóa giống với key trong MenuToggleKey
+        public GameObject panel;     // Panel cần bật khi toggle bật
     }
 
-    [Header("Toggle-Panel Mapping (by key)")]
-    [Tooltip("Ánh xạ các Toggle khác (ngoài Inventory/Equipment/InfoItem) tới Panel tương ứng. Gọi OnToggleSelected(key) từ Toggle.")]
-    public ToggleKeyPanel[] otherTogglePanels;
+    [Header("Panel Mappings (key -> panel)")]
+    public PanelMapping[] panelMappings; // Không cần tham chiếu Toggle nữa
 
+    private GameObject _currentSinglePanel; // Panel đơn hiện tại (không phải cặp inventory combo)
 
     void Awake()
     {
@@ -53,6 +44,8 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         ShowController();
+        // Không auto wire toggle vì mỗi toggle tự gọi OnToggleSelected qua MenuToggleKey
+        // Nếu muốn panel mặc định nào đó, có thể bật toggle tương ứng trong Inspector
     }
     void Update() { }
 
@@ -84,7 +77,8 @@ public class UIManager : MonoBehaviour
         menuPanel.SetActive(true);
         openButton.SetActive(false);
         exitButton.SetActive(true);
-
+    // Đảm bảo tắt sạch mọi panel cũ trước khi mở mặc định
+    HideAllMenuPanels();
     // Mở tab mặc định = Inventory/Equipment
     ShowInventoryAndEquipment();
     RefreshInventoryUI();
@@ -115,7 +109,8 @@ public class UIManager : MonoBehaviour
         menuPanel.SetActive(true);
         openButton.SetActive(false);
         exitButton.SetActive(true);
-
+    // Tắt toàn bộ panel trước để tránh chồng (trường hợp mở lại menu)
+    HideAllMenuPanels();
     if (inventoryPanel != null) inventoryPanel.SetActive(true);
     if (equipmentPanel != null) equipmentPanel.SetActive(true);
     if (infoItemPanel != null) infoItemPanel.SetActive(false);
@@ -130,7 +125,8 @@ public class UIManager : MonoBehaviour
         menuPanel.SetActive(true);
         openButton.SetActive(false);
         exitButton.SetActive(true);
-
+    // Tắt toàn bộ panel trước để tránh chồng
+    HideAllMenuPanels();
     if (inventoryPanel != null) inventoryPanel.SetActive(true);
     if (equipmentPanel != null) equipmentPanel.SetActive(false);
     if (infoItemPanel != null) infoItemPanel.SetActive(true);
@@ -160,39 +156,66 @@ public class UIManager : MonoBehaviour
     {
         if (string.IsNullOrEmpty(key)) return;
 
-        // Các khóa xử lý riêng
+        // Chuẩn bị trạng thái chung khi vào một menu
+        controllerPanel.SetActive(false);
+        menuPanel.SetActive(true);
+        if (openButton) openButton.SetActive(false);
+        if (exitButton) exitButton.SetActive(true);
+
+        // Tổ hợp đặc biệt
         if (key.Equals("Inventory", System.StringComparison.OrdinalIgnoreCase)
             || key.Equals("Equipment", System.StringComparison.OrdinalIgnoreCase))
         {
+            HideAllMenuPanels();
             ShowInventoryAndEquipment();
+            _currentSinglePanel = null; // đang ở chế độ combo
             return;
         }
         if (key.Equals("InfoItem", System.StringComparison.OrdinalIgnoreCase))
         {
+            HideAllMenuPanels();
             ShowInventoryAndInfoItem();
+            _currentSinglePanel = null;
+            return;
+        }
+        if (key.Equals("InfoPlayer", System.StringComparison.OrdinalIgnoreCase))
+        {
+            HideAllMenuPanels();
+            if (infoPlayerPanel) infoPlayerPanel.SetActive(true);
+            _currentSinglePanel = infoPlayerPanel;
+            // Gọi refresh động
+            var info = infoPlayerPanel != null ? infoPlayerPanel.GetComponentInChildren<Xianxia.UI.InfoPlayer.InfoManager>(true) : null;
+            info?.RefreshNow();
             return;
         }
 
-        // Các khóa khác sử dụng ánh xạ otherTogglePanels
-        controllerPanel.SetActive(false);
-        menuPanel.SetActive(true);
-        if (openButton != null) openButton.SetActive(false);
-        if (exitButton != null) exitButton.SetActive(true);
-
+        // Panel đơn còn lại (InfoPlayer, Skill, Quest, Map, Creating, Achievement, Social, Pet, Settings ... )
         HideAllMenuPanels();
-
-        if (otherTogglePanels != null)
+        var panel = FindPanelByKey(key);
+        if (panel != null)
         {
-            foreach (var b in otherTogglePanels)
-            {
-                if (b == null || b.panel == null) continue;
-                if (!string.IsNullOrEmpty(b.key) && b.key.Equals(key, System.StringComparison.OrdinalIgnoreCase))
-                {
-                    b.panel.SetActive(true);
-                    break;
-                }
-            }
+            panel.SetActive(true);
+            _currentSinglePanel = panel;
+            return;
         }
+
+        // Không tìm thấy panel -> không làm gì (giữ trạng thái trước đó)
+    }
+
+    private GameObject FindPanelByKey(string key)
+    {
+        if (panelMappings == null) return null;
+        for (int i = 0; i < panelMappings.Length; i++)
+        {
+            var pm = panelMappings[i];
+            if (pm == null || pm.panel == null) continue;
+            if (!string.IsNullOrEmpty(pm.key) && pm.key.Equals(key, System.StringComparison.OrdinalIgnoreCase))
+                return pm.panel;
+            // Fallback: so sánh với tên panel nếu key không matches
+            if (pm.panel.name.Equals(key, System.StringComparison.OrdinalIgnoreCase))
+                return pm.panel;
+        }
+        return null;
     }
 
     private void HideAllMenuPanels()
@@ -209,14 +232,40 @@ public class UIManager : MonoBehaviour
         if (achievementPanel != null) achievementPanel.SetActive(false);
         if (socialPanel != null) socialPanel.SetActive(false);
         if (petPanel != null) petPanel.SetActive(false);
+    }
 
-        // Đồng thời tắt các panel map qua otherTogglePanels nếu có
-        if (otherTogglePanels != null)
+    // ----------------------
+    // Inventory special-case external triggers
+    // ----------------------
+
+    // Gọi khi bắt đầu/ kết thúc kéo item để bật/tắt equipmentPanel nếu inventory đang mở.
+    public void OnInventoryItemDragState(bool dragging)
+    {
+        // Chỉ tác động nếu inventory toggle đang là menu hiện hành (inventoryPanel active)
+        if (inventoryPanel != null && inventoryPanel.activeSelf)
         {
-            foreach (var b in otherTogglePanels)
+            if (equipmentPanel != null)
+                equipmentPanel.SetActive(dragging); // hiện khi dragging
+        }
+    }
+
+    // Gọi khi click item để hiển thị info item panel (inventory vẫn mở)
+    public void ShowInventoryItemInfoPanel()
+    {
+        if (inventoryPanel != null && inventoryPanel.activeSelf)
+        {
+            if (infoItemPanel != null)
             {
-                if (b != null && b.panel != null) b.panel.SetActive(false);
+                infoItemPanel.SetActive(true);
+                if (equipmentPanel != null) equipmentPanel.SetActive(false); // tránh chồng chéo nếu muốn
             }
         }
     }
+
+    public void HideInventoryItemInfoPanel()
+    {
+        if (infoItemPanel != null) infoItemPanel.SetActive(false);
+    }
+
+    // EnforceSingleToggle removed – rely on Unity ToggleGroup if cần độc quyền
 }

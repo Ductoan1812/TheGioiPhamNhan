@@ -356,6 +356,7 @@ GameObject:
   - component: {fileID: 2359877960849153216}
   - component: {fileID: 5143379674672177386}
   - component: {fileID: 7703448031467584874}
+  - component: {fileID: 1152153680475109662}
   m_Layer: 5
   m_Name: Info_Equip
   m_TagString: Untagged
@@ -377,10 +378,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 8522474003652696275}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 548.76, y: 476.01}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: -0.00002350934, y: -126.170166}
+  m_SizeDelta: {x: 548.76, y: 0}
   m_Pivot: {x: -0.00000004284084, y: 0.99999964}
 --- !u!222 &5143379674672177386
 CanvasRenderer:
@@ -482,6 +483,20 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1152153680475109662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5657386748339954196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
 --- !u!1 &7364790730263565612
 GameObject:
   m_ObjectHideFlags: 0
@@ -567,8 +582,9 @@ GameObject:
   - component: {fileID: 5236259776468687016}
   - component: {fileID: 6308512899283100439}
   - component: {fileID: 5331199388085434455}
+  - component: {fileID: 8680189396299663021}
   m_Layer: 5
-  m_Name: Slot_1
+  m_Name: InfoEquip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -629,3 +645,19 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
+--- !u!114 &8680189396299663021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8396796847162785318}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 848e18e29a764c840821d6b61f242bb1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Xianxia.UI.InfoPlayer.EquippedItemView
+  iconImage: {fileID: 3821601736194215040}
+  nameText: {fileID: 780566280085905734}
+  descText: {fileID: 7703448031467584874}
+  slotIdText: {fileID: 0}

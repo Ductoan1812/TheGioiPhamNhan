@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2618690411248489718}
   - component: {fileID: 1507218491767487908}
   - component: {fileID: -7069778818277627665}
+  - component: {fileID: 5824085732838634669}
   m_Layer: 5
   m_Name: btn_menu
   m_TagString: Untagged
@@ -142,6 +143,19 @@ MonoBehaviour:
   downOffset: 6
   animTime: 0.08
   snapToInt: 1
+--- !u!114 &5824085732838634669
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4119310154371686620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e0edaf2e385a684f90402997bb1d6f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MenuToggleKey
+  key: 
 --- !u!1 &4249795184714742329
 GameObject:
   m_ObjectHideFlags: 0

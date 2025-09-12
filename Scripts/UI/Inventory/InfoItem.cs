@@ -20,6 +20,37 @@ public class InfoItem : MonoBehaviour
     [Header("Nguồn dữ liệu")]
     public ItemDatabaseSO itemDB; // nếu null sẽ dùng ItemDatabaseSO.Instance
     
+    // Màu cho rarity & element (có thể chỉnh trong inspector nếu muốn -> chuyển sang public nếu cần)
+    private static readonly System.Collections.Generic.Dictionary<Rarity, string> RarityColors = new()
+    {
+        { Rarity.pham, "#B0B0B0" },    // ghi
+        { Rarity.hoang, "#3CD321" },   // xanh lá tươi
+        { Rarity.huyen, "#1E90FF" },   // xanh dương
+        { Rarity.dia,   "#8A2BE2" },   // tím vừa
+        { Rarity.thien, "#FF7F00" },   // cam
+        { Rarity.tien,  "#FF1493" },   // hồng đậm
+        { Rarity.than,  "#FFD700" }    // vàng kim
+    };
+
+    private static readonly System.Collections.Generic.Dictionary<Element, string> ElementColors = new()
+    {
+        { Element.none, "#FFFFFF" },
+        { Element.kim,  "#E6E6E6" }, // ánh kim nhạt
+        { Element.moc,  "#8B5A2B" }, // gỗ nâu
+        { Element.thuy, "#00BFFF" }, // xanh nước
+        { Element.hoa,  "#FF2400" }, // đỏ rực
+        { Element.tho,  "#C2B280" }, // màu đất
+        { Element.loi,  "#BA55D3" }, // tím sét
+        { Element.am,   "#9370DB" }, // tím nhạt
+        { Element.duong,"#FFFACD" }  // vàng nhạt
+    };
+
+    private static string Colorize(string text, string hex)
+    {
+        if (string.IsNullOrEmpty(text) || string.IsNullOrEmpty(hex)) return text;
+        return $"<color={hex}>{text}</color>";
+    }
+    
 
     public void Hide()
     {
@@ -43,8 +74,8 @@ public class InfoItem : MonoBehaviour
             icon.sprite = sp;
             icon.enabled = sp != null;
         }
-        if (nameText != null) nameText.text = item.name ?? item.id;
-        if (descText != null) descText.text = BuildDesc(item);
+    if (nameText != null) nameText.text = item.name ?? item.id;
+    if (descText != null) descText.text = BuildDescription(item, itemDB);
 
         gameObject.SetActive(true);
     }
@@ -59,23 +90,31 @@ public class InfoItem : MonoBehaviour
         _wired = true;
     }
 
-    // Tạo mô tả: cộng gộp chỉ số từ DB và từ InventoryItem (coi giá trị trong InventoryItem là delta)
-    private string BuildDesc(InventoryItem inv)
+    // Public static để dùng lại ở InfoManager hiển thị trang bị đang mặc
+    public static string BuildDescription(InventoryItem inv, ItemDatabaseSO overrideDb = null)
     {
-        var db = itemDB != null ? itemDB : ItemDatabaseSO.Instance;
+        if (inv == null) return string.Empty;
+        var db = overrideDb != null ? overrideDb : ItemDatabaseSO.Instance;
         var def = db != null ? db.GetById(inv.id) : null;
 
         var sb = new StringBuilder();
         const string deltaColor = "#00FF66"; // xanh lá cho phần delta
 
-        // 1) Thông tin chung (trừ ID/Name)
-    if (def != null)
+        if (def != null)
         {
-            AppendLine(sb, "Phẩm chất", def.rarity.ToString());
-            AppendLine(sb, "Ngũ hành", def.element.ToString());
-            AppendLine(sb, "yêu cầu", def.realmRequirement.ToString());
+            // Phẩm chất + Ngũ hành có màu
+            string rarityStr = def.rarity.ToString();
+            if (RarityColors.TryGetValue(def.rarity, out var rCol)) rarityStr = Colorize(rarityStr, rCol);
+            string elemStr = def.element.ToString();
+            if (ElementColors.TryGetValue(def.element, out var eCol)) elemStr = Colorize(elemStr, eCol);
+
+            // Realm requirement màu đỏ nếu chưa đạt (giả định player realm < yêu cầu). Không có player realm ở đây -> chỉ tô đỏ nhấn mạnh.
+            string realmStr = Colorize(def.realmRequirement.ToString(), "#FF3333");
+
+            AppendLine(sb, "Phẩm chất", rarityStr);
+            AppendLine(sb, "Ngũ hành", elemStr);
+            AppendLine(sb, "Yêu cầu", realmStr);
             AppendInt(sb, "Cấp", def.level, inv.level, deltaColor);
-            // Base stats chính
             AppendStat(sb, "Tấn công", def.baseStats.atk, inv.baseStats.atk, deltaColor);
             AppendStat(sb, "Phòng thủ", def.baseStats.defense, inv.baseStats.defense, deltaColor);
             AppendStat(sb, "Sinh lực", def.baseStats.hp, inv.baseStats.hp, deltaColor);
@@ -86,44 +125,35 @@ public class InfoItem : MonoBehaviour
             AppendStat(sb, "Xuyên giáp", def.baseStats.penetration, inv.baseStats.penetration, deltaColor);
             AppendStat(sb, "Hút khí", def.baseStats.lifestealQi, inv.baseStats.lifestealQi, deltaColor);
 
-            // Kháng (resist)
             if (def.baseStats.res != null && inv.baseStats.res != null)
             {
-                AppendStat(sb, "Kháng Kim", def.baseStats.res.kim, inv.baseStats.res.kim, deltaColor);
-                AppendStat(sb, "Kháng Mộc", def.baseStats.res.moc, inv.baseStats.res.moc, deltaColor);
-                AppendStat(sb, "Kháng Thủy", def.baseStats.res.thuy, inv.baseStats.res.thuy, deltaColor);
-                AppendStat(sb, "Kháng Hỏa", def.baseStats.res.hoa, inv.baseStats.res.hoa, deltaColor);
-                AppendStat(sb, "Kháng Thổ", def.baseStats.res.tho, inv.baseStats.res.tho, deltaColor);
-                AppendStat(sb, "Kháng Lôi", def.baseStats.res.loi, inv.baseStats.res.loi, deltaColor);
-                AppendStat(sb, "Kháng Âm", def.baseStats.res.am, inv.baseStats.res.am, deltaColor);
-                AppendStat(sb, "Kháng Dương", def.baseStats.res.duong, inv.baseStats.res.duong, deltaColor);
+                // Gán màu theo element trong label (giữ value logic cũ)
+                AppendStat(sb, Colorize("Kháng Kim", ElementColors[Element.kim]),   def.baseStats.res.kim,   inv.baseStats.res.kim,   deltaColor);
+                AppendStat(sb, Colorize("Kháng Mộc", ElementColors[Element.moc]),   def.baseStats.res.moc,   inv.baseStats.res.moc,   deltaColor);
+                AppendStat(sb, Colorize("Kháng Thủy", ElementColors[Element.thuy]), def.baseStats.res.thuy, inv.baseStats.res.thuy, deltaColor);
+                AppendStat(sb, Colorize("Kháng Hỏa", ElementColors[Element.hoa]),   def.baseStats.res.hoa,   inv.baseStats.res.hoa,   deltaColor);
+                AppendStat(sb, Colorize("Kháng Thổ", ElementColors[Element.tho]),   def.baseStats.res.tho,   inv.baseStats.res.tho,   deltaColor);
+                AppendStat(sb, Colorize("Kháng Lôi", ElementColors[Element.loi]),   def.baseStats.res.loi,   inv.baseStats.res.loi,   deltaColor);
+                AppendStat(sb, Colorize("Kháng Âm", ElementColors[Element.am]),     def.baseStats.res.am,    inv.baseStats.res.am,    deltaColor);
+                AppendStat(sb, Colorize("Kháng Dương", ElementColors[Element.duong]), def.baseStats.res.duong, inv.baseStats.res.duong, deltaColor);
             }
 
-            // Sockets
             AppendInt(sb, "Sockets", def.sockets, inv.sockets, deltaColor);
-            // Phụ tố/Affix
             if (def.affixes != null && def.affixes.Length > 0)
                 AppendLine(sb, "Phụ tố", FormatAffixes(def.affixes));
             if (inv.affixes != null && inv.affixes.Length > 0)
                 AppendLine(sb, "Phụ tố (bổ sung)", FormatAffixes(inv.affixes));
-            // Hiệu ứng dùng
             if (def.useEffect != null && !string.IsNullOrEmpty(def.useEffect.type))
             {
                 var ue = def.useEffect;
-                var ueText = new StringBuilder()
-                    .Append(ue.type);
+                var ueText = new StringBuilder().Append(ue.type);
                 if (ue.magnitude != 0) ueText.Append($", magnitude: {FormatNumber(ue.magnitude)}");
                 if (ue.duration != 0) ueText.Append($", duration: {FormatNumber(ue.duration)}s");
                 if (!string.IsNullOrEmpty(ue.spellId)) ueText.Append($", spell: {ue.spellId}");
                 AppendLine(sb, "Hiệu ứng dùng", ueText.ToString());
             }
         }
-        else
-        {
-            sb.Append("(Không tìm thấy dữ liệu gốc từ ItemDatabase)");
-        }
 
-        // Thêm flavor/desc ở cuối nếu có
         if (!string.IsNullOrEmpty(inv.flavor))
         {
             if (sb.Length > 0) sb.Append('\n');

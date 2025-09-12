@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Xianxia.PlayerDataSystem;
+using Xianxia.Items;
 
 namespace Xianxia.UI.InfoPlayer
 {
@@ -16,6 +17,13 @@ namespace Xianxia.UI.InfoPlayer
 		[SerializeField] private Button cancelButton;
 		[SerializeField] private Transform rowsParent;         // parent chứa các row stat
 		[SerializeField] private StatAllocateRow rowPrefab;
+
+		[Header("Equipped Items Display")] // khu vực chỉ hiển thị trang bị đang mặc
+		[SerializeField] private Transform equippedItemsParent; // content riêng
+		[SerializeField] private EquippedItemView equippedItemPrefab; // prefab có Image icon, TMP name, TMP desc
+		[SerializeField] private ItemDatabaseSO itemDatabase;
+		[Tooltip("Các slot id không muốn hiển thị (vd: body, underwear, internal)" )]
+		[SerializeField] private List<string> hiddenSlotIds = new List<string>();
 
 		[Header("Stat Config")] // danh sách stat muốn hiển thị (id -> label)
 		[SerializeField] private List<StatEntry> statsToShow = new List<StatEntry>
@@ -47,6 +55,7 @@ namespace Xianxia.UI.InfoPlayer
 		private readonly List<StatAllocateRow> _rows = new List<StatAllocateRow>();
 		private PlayerStatsManager _statsManager;
 		private PlayerData _playerData;
+		private readonly List<EquippedItemView> _equipViews = new List<EquippedItemView>();
 
 		private int _available;       // điểm thực tế có (pors)
 		private int _tempRemaining;   // điểm còn lại trong phiên phân phối
@@ -57,6 +66,7 @@ namespace Xianxia.UI.InfoPlayer
 			_statsManager = Object.FindFirstObjectByType<PlayerStatsManager>();
 			_playerData = PlayerManager.Instance?.Data;
 			BuildRows();
+			BuildEquippedViews();
 			Hook();
 			RefreshAll();
 			SetAllocateMode(false);
@@ -81,6 +91,7 @@ namespace Xianxia.UI.InfoPlayer
 		{
 			_playerData = data;
 			RefreshAll();
+			RefreshEquippedItems();
 		}
 
 		private void Hook()
@@ -123,6 +134,109 @@ namespace Xianxia.UI.InfoPlayer
 			var current = _statsManager != null ? GetCurrentStats() : _playerData?.stats;
 			foreach (var r in _rows) r.RefreshValue(current);
 			UpdateButtonsState();
+			RefreshEquippedItems();
+		}
+
+		// Public API để ép cập nhật lại dữ liệu mới nhất mỗi khi tab mở
+		public void RefreshNow()
+		{
+			// lấy lại tham chiếu data phòng trường hợp PlayerManager đổi instance
+			_playerData = PlayerManager.Instance?.Data;
+			_statsManager = Object.FindFirstObjectByType<PlayerStatsManager>();
+			RefreshAll();
+			// Ép rebuild layout để Text / ContentSizeFitter cập nhật đúng kích thước khi panel vừa mở
+			ForceLayoutRebuild();
+		}
+
+		private void ForceLayoutRebuild()
+		{
+			// Thực hiện 2 frame: rebuild ngay và queue thêm 1 late rebuild nếu cần
+			if (!gameObject.activeInHierarchy) return; // panel chưa active => bỏ
+			var root = transform as RectTransform;
+			if (root == null) return;
+			Canvas.ForceUpdateCanvases();
+			UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(root);
+			// Schedule 1 more at end of frame để chắc chắn (trong trường hợp icon async làm thay đổi chiều cao)
+			StartCoroutine(CoDelayedRebuild(root));
+		}
+
+		private System.Collections.IEnumerator CoDelayedRebuild(RectTransform root)
+		{
+			yield return null; // chờ 1 frame
+			if (root == null || !root.gameObject.activeInHierarchy) yield break;
+			Canvas.ForceUpdateCanvases();
+			UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(root);
+		}
+
+		private bool IsHiddenSlot(string slotId)
+		{
+			if (string.IsNullOrEmpty(slotId) || hiddenSlotIds == null) return false;
+			for (int i = 0; i < hiddenSlotIds.Count; i++)
+			{
+				if (string.Equals(hiddenSlotIds[i], slotId, System.StringComparison.OrdinalIgnoreCase)) return true;
+			}
+			return false;
+		}
+
+		private void BuildEquippedViews()
+		{
+			if (equippedItemsParent == null || equippedItemPrefab == null) return;
+			// Xóa mạnh mẽ tất cả con (tránh case Destroy delay gây nhân đôi ở frame kế tiếp)
+			for (int i = equippedItemsParent.childCount - 1; i >= 0; i--)
+			{
+				var child = equippedItemsParent.GetChild(i).gameObject;
+#if UNITY_EDITOR
+				if (!Application.isPlaying)
+					DestroyImmediate(child);
+				else
+#endif
+					Destroy(child);
+			}
+			_equipViews.Clear();
+			if (_playerData?.equipment == null) return;
+			var usedSlots = new HashSet<string>();
+			foreach (var (slotId, item) in _playerData.equipment.EnumerateSlots())
+			{
+				if (IsHiddenSlot(slotId)) continue;
+				if (string.IsNullOrEmpty(slotId)) continue;
+				if (IsSlotEmpty(item)) continue; // slot trống theo định nghĩa mới
+				if (!usedSlots.Add(slotId)) continue; // tránh trùng
+				var view = Instantiate(equippedItemPrefab, equippedItemsParent);
+				UpdateEquippedViewAsync(view, slotId, item);
+				_equipViews.Add(view);
+			}
+		}
+
+		private void RefreshEquippedItems()
+		{
+			if (equippedItemsParent == null || equippedItemPrefab == null) return;
+			if (_playerData?.equipment == null) return;
+			// Luôn rebuild danh sách gọn chỉ gồm item thực sự có
+			BuildEquippedViews();
+			ForceLayoutRebuild();
+		}
+
+		private async void UpdateEquippedViewAsync(EquippedItemView view, string slotId, InventoryItem item)
+		{
+			if (view == null || IsSlotEmpty(item)) return;
+			Sprite icon = null;
+			var db = itemDatabase != null ? itemDatabase : ItemDatabaseSO.Instance;
+			var def = db != null ? db.GetById(item.id) : null;
+			string iconAddr = def != null && !string.IsNullOrEmpty(def.addressIcon) ? def.addressIcon : item.addressIcon;
+			if (!string.IsNullOrEmpty(iconAddr))
+			{
+				icon = await Xianxia.Items.ItemAssets.LoadIconSpriteAsync(iconAddr);
+			}
+			string name = item.name ?? item.id;
+			string desc = InfoItem.BuildDescription(item, db);
+			view.SetData(slotId, icon, name, desc);
+			// Mỗi lần icon loaded có thể thay đổi kích thước layout
+			ForceLayoutRebuild();
+		}
+
+		private bool IsSlotEmpty(InventoryItem item)
+		{
+			return item == null || string.IsNullOrEmpty(item.id);
 		}
 
 		private PlayerStats GetCurrentStats()
