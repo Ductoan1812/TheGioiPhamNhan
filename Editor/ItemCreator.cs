@@ -289,7 +289,7 @@ public class ItemCreator : EditorWindow
             category = ItemCategory.weapon.ToString(),
             rarity = Rarity.pham.ToString(),
             element = Element.none.ToString(),
-            realmRequirement = Realm.none.ToString(),
+            realmRequirement = Realm.PhamNhan.ToString(),
             bindType = BindType.none.ToString(),
             level = 1,
             maxStack = 1,
@@ -392,7 +392,7 @@ public class ItemCreator : EditorWindow
         elem = (Element)EditorGUILayout.EnumPopup("Ngũ hành", elem);
         dto.element = elem.ToString();
 
-        var realm = ParseEnum(dto.realmRequirement, Realm.none);
+        var realm = ParseEnum(dto.realmRequirement, Realm.PhamNhan);
         realm = (Realm)EditorGUILayout.EnumPopup("Cảnh giới yêu cầu", realm);
         dto.realmRequirement = realm.ToString();
 

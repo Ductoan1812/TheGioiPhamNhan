@@ -6,6 +6,8 @@ using Xianxia.Items;
 [DisallowMultipleComponent]
 public class PlayerStatsManager : MonoBehaviour
 {
+    // Level lấy trực tiếp từ PlayerData (không cần field riêng)
+    public int Level => PlayerManager.Instance?.Data?.level ?? 1;
     [Header("Base stats (từ PlayerData.stats gốc hoặc level)")]
     [SerializeField] private PlayerStats statsBaseData;
     [Header("Equipment cộng thêm")]
@@ -14,6 +16,8 @@ public class PlayerStatsManager : MonoBehaviour
     [SerializeField] private PlayerStats statsCurrentData;
 
     public UnityEvent onStatsRecalculated;
+    [Header("Level System")]
+    [SerializeField] private Xianxia.Progression.LevelSystem levelSystem; // tham chiếu optional
     //get set base stats
     public PlayerStats StatsBaseData { get => statsBaseData; set => statsBaseData = value; }
     public PlayerStats StatsEquipData { get => statsEquipData; set => statsEquipData = value; }
@@ -50,6 +54,11 @@ public class PlayerStatsManager : MonoBehaviour
         if (data == null || data.stats == null) return;
         // Copy về base
         CopyStats(data.stats, statsBaseData);
+        // đảm bảo xpMax hợp lý (nếu cấu hình hệ thống level)
+        if (levelSystem != null && data.stats.xpMax <= 0)
+        {
+            data.stats.xpMax = levelSystem.GetExpRequired(data.realm, data.level);
+        }
         // Recalc equipment + current
         RecalculateAll(data);
     }
@@ -198,6 +207,49 @@ public class PlayerStatsManager : MonoBehaviour
         if (save) PlayerManager.Instance.SavePlayer();
     }
 
+    // Wrapper thêm exp sử dụng LevelSystem nếu có
+    public void AddExp(int amount, bool autoLevel = true)
+    {
+        var data = PlayerManager.Instance?.Data;
+        if (data == null || amount <= 0) return;
+        if (levelSystem != null)
+        {
+            levelSystem.AddExp(data, amount, autoLevel);
+        }
+        else
+        {
+            data.stats.xp += amount;
+            if (data.stats.xpMax <= 0) data.stats.xpMax = 100 * Mathf.Max(1, data.level);
+            if (autoLevel && data.stats.xp >= data.stats.xpMax)
+            {
+                data.stats.xp -= data.stats.xpMax;
+                data.level++;
+                data.stats.xpMax = 100 * Mathf.Max(1, data.level);
+            }
+            PlayerManager.Instance?.SavePlayer();
+        }
+    }
+
+    // Lấy số EXP cần để lên level kế tiếp (đồng bộ với hệ thống level)
+    public int ExpRequiredForNextLevel()
+    {
+        var data = PlayerManager.Instance?.Data;
+        if (data == null) return 0;
+        if (levelSystem != null)
+            return levelSystem.GetExpRequired(data.realm, data.level);
+        return 100 * Mathf.Max(1, data.level); // fallback
+    }
+
+    // Lấy tiến độ hiện tại (0..1) dựa trên xp / xpMax
+    public float ExpProgress01()
+    {
+        var data = PlayerManager.Instance?.Data;
+        if (data == null || data.stats == null) return 0f;
+        float need = data.stats.xpMax > 0 ? data.stats.xpMax : ExpRequiredForNextLevel();
+        if (need <= 0) return 0f;
+        return Mathf.Clamp01(data.stats.xp / need);
+    }
+
     // Exposed getters (ví dụ UI binding)
     public float hp => statsCurrentData?.hp ?? 0;
     public float hpMax => statsCurrentData?.hpMax ?? 0;
@@ -205,6 +257,7 @@ public class PlayerStatsManager : MonoBehaviour
     public float def => statsCurrentData?.def ?? 0;
     public float moveSpd => statsCurrentData?.moveSpd ?? 0;
     public float critRate => statsCurrentData?.critRate ?? 0;
+    public float critDmg => statsCurrentData?.critDmg ?? 0; // added getter for PlayerAttack
     public float hpRegen => statsCurrentData?.hpRegen ?? 0;
     public float qi => statsCurrentData?.qi ?? 0;
     public float qiMax => statsCurrentData?.qiMax ?? 0;
@@ -213,4 +266,32 @@ public class PlayerStatsManager : MonoBehaviour
     public float spellResist => statsCurrentData?.spellResist ?? 0;
     public float dodge => statsCurrentData?.dodge ?? 0;
     public float pierce => statsCurrentData?.pierce ?? 0;
+}
+
+public static class PlayerStatsManagerExtensions
+{
+    /// <summary>
+    /// Basic damage intake for player (temporary). Later move to dedicated combat/health component.
+    /// Applies raw damage (no defense yet) and clamps HP. Returns true if HP changed.
+    /// </summary>
+    public static bool TakeDamage(this PlayerStatsManager mgr, int amount, bool isCrit = false)
+    {
+        if (mgr == null || amount <= 0) return false;
+        var stats = mgr.StatsCurrentData;
+        if (stats == null) return false;
+        if (stats.hp <= 0) return false; // already dead
+        float old = stats.hp;
+        stats.hp = Mathf.Clamp(stats.hp - amount, 0, stats.hpMax);
+        if (stats.hp != old)
+        {
+            // Floating combat text
+            if (FloatingCombatTextSpawner.InstanceFCT)
+            {
+                FloatingCombatTextSpawner.InstanceFCT.ShowDamage(mgr.transform.position, amount, isCrit);
+            }
+            // TODO: raise event / death handling later
+            return true;
+        }
+        return false;
+    }
 }

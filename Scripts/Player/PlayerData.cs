@@ -140,7 +140,7 @@ namespace Xianxia.PlayerDataSystem
     [Serializable]
     public class CurrencyData
     {
-        public int gold;
+        public int silver;
         public int spirit_stone;
     }
 

@@ -50,7 +50,8 @@ public class EnemyAttack : MonoBehaviour
         var playerStats = target.GetComponent<PlayerStatsManager>();
         if (playerStats != null)
         {
-           // playerStats.TakeDamage(damage);
+           // Simple direct damage -> you can later implement defense, dodge, etc.
+           playerStats.TakeDamage(damage, false);
         }
     }
 

@@ -3126,11 +3126,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 776936823144749742, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 776936823144749742, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: playerLayer.m_Bits
-      value: 0
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 776936823144749742, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: useControllerLayer
@@ -3197,6 +3197,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4998291795467132174, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
+      propertyPath: maxHealth
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 4998291795467132174, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: dropItemId
       value: sword01
       objectReference: {fileID: 0}
@@ -3205,8 +3209,12 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 4998291795467132174, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
+      propertyPath: currentHealth
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4998291795467132174, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: playerLayer.m_Bits
-      value: 0
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 4998291795467132174, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: onDeath.m_PersistentCalls.m_Calls.Array.size
@@ -3262,7 +3270,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7768691831212010931, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: playerLayer.m_Bits
-      value: 0
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 8274967068246155955, guid: b20e7a89023156746b72befca3e0ec25, type: 3}
       propertyPath: m_SortingLayer
@@ -29582,6 +29590,7 @@ GameObject:
   - component: {fileID: 817079052}
   - component: {fileID: 817079051}
   - component: {fileID: 817079053}
+  - component: {fileID: 817079054}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -29641,6 +29650,19 @@ MonoBehaviour:
   bounceForceMax3D: 4
   torqueMin3D: -10
   torqueMax3D: 10
+--- !u!114 &817079054
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 817079050}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d61eecf7bc164f4993eb32af357ccc0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Xianxia.Progression.LevelSystem
+  config: {fileID: 11400000, guid: 1bea3442bb20b6842ac5fc1017c9cf69, type: 2}
 --- !u!1 &827067716
 GameObject:
   m_ObjectHideFlags: 0
@@ -73301,7 +73323,6 @@ MonoBehaviour:
   itemDatabase: {fileID: 11400000, guid: e1dc69d3eb0c09a45a33bebcfa7218d7, type: 2}
   hiddenSlotIds:
   - Body
-  showOnlyFilledSlots: 1
   statsToShow:
   - id: hpMax
     label: "Sinh l\u1EF1c"
@@ -73978,6 +73999,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61e7662f60ef92849af52528c2ee48f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUI
+  hpFill: {fileID: 1669132861}
+  manaFill: {fileID: 838752656}
+  expFill: {fileID: 851406080}
+  hpSlider: {fileID: 0}
+  manaSlider: {fileID: 0}
+  expSlider: {fileID: 0}
+  hpText: {fileID: 238106219}
+  manaText: {fileID: 142296441}
+  expPercentText: {fileID: 1710962986}
+  levelText: {fileID: 1162395992}
 --- !u!114 &1651876930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74065,6 +74096,27 @@ MonoBehaviour:
   onStatsRecalculated:
     m_PersistentCalls:
       m_Calls: []
+  levelSystem: {fileID: 0}
+--- !u!114 &1651876931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1651876912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74de4fb61417a8a41a956f8833106f91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
+  attackRadius: 1.2
+  attackCooldown: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  requireFacing: 0
+  facingDotThreshold: 0
+  showGizmo: 1
 --- !u!212 &1667565898 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 8886346903849194165, guid: e6b7b63e47fdc3b478f71be758d14e5b, type: 3}
@@ -116555,6 +116607,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2488282146937353282, guid: e6b7b63e47fdc3b478f71be758d14e5b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1651876930}
+    - targetCorrespondingSourceObject: {fileID: 2488282146937353282, guid: e6b7b63e47fdc3b478f71be758d14e5b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1651876931}
   m_SourcePrefab: {fileID: 100100000, guid: e6b7b63e47fdc3b478f71be758d14e5b, type: 3}
 --- !u!1 &2071631896
 GameObject:

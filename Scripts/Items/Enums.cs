@@ -24,7 +24,7 @@ namespace Xianxia.Items
     [Serializable]
     public enum Realm
     {
-        none, luyen_khi, truc_co, kim_dan, nguyen_anh, hoa_than, luyen_hu, hop_the, dai_thua, do_kiep
+        PhamNhan, luyen_khi, truc_co, kim_dan, nguyen_anh, hoa_than, luyen_hu, hop_the, dai_thua, do_kiep
     }
 
     [Serializable]

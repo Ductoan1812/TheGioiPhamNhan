@@ -12,11 +12,11 @@ namespace Xianxia.Items
         public ItemCategory category;
         public Rarity rarity;
         public Element element = Element.none;
-        public Realm realmRequirement = Realm.none;
+        public Realm realmRequirement = Realm.PhamNhan;
         public BindType bindType = BindType.none;
 
-    public int level = 1;
-    public int maxStack = 1;
+        public int level = 1;
+        public int maxStack = 1;
 
         public BaseStats baseStats = new BaseStats();
         public int sockets = 0;

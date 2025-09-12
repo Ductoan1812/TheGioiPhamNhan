@@ -42,6 +42,11 @@ public class EnemyDamageTracker : MonoBehaviour, IDamageable
         if (ctx.amount <= 0 || IsDead) return false;
         if (stats.TakeDamage(ctx.amount))
         {
+            // Show floating combat text
+            if (FloatingCombatTextSpawner.InstanceFCT)
+            {
+                FloatingCombatTextSpawner.InstanceFCT.ShowDamage(transform.position, ctx.amount, ctx.isCrit);
+            }
             Record(ctx.attacker, ctx.amount);
             lastHitAttacker = ctx.attacker;
             return true;
