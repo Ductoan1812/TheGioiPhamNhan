@@ -101,6 +101,9 @@ namespace Xianxia.PlayerDataSystem
 
             // Migration from legacy stats if present
             data.MigrateLegacyStatsIfNeeded();
+            // Nếu tất cả core stat đều =0 -> gán bộ mặc định để tránh cảm giác 'reset'
+            data.EnsureDefaultStatsIfUninitialized();
+            Debug.Log($"[PlayerData] Loaded stats entries={data.stats?.AllIds?.ToString() ?? ""}; Save path={path}");
             return data;
         }
 
@@ -139,36 +142,68 @@ namespace Xianxia.PlayerDataSystem
         private void MigrateLegacyStatsIfNeeded()
         {
             if (legacyStats == null) return;
-            // Map legacy to new stat ids (base values)
-            stats.SetBase(StatId.KhiHuyetMax, legacyStats.khiHuyet_toida);
-            stats.SetBase(StatId.KhiHuyet, legacyStats.khiHuyet);
-            stats.SetBase(StatId.LinhLucMax, legacyStats.linhLuc_toida);
-            stats.SetBase(StatId.LinhLuc, legacyStats.linhLuc);
-            stats.SetBase(StatId.ThoNguyenMax, legacyStats.thoNguyen_toida);
-            stats.SetBase(StatId.ThoNguyen, legacyStats.thoNguyen);
-            stats.SetBase(StatId.TuVi, legacyStats.tuVi);
-            stats.SetBase(StatId.DaoHanh, legacyStats.daoHanh);
-            stats.SetBase(StatId.DaoTam, legacyStats.daoTam);
-            stats.SetBase(StatId.NgoTinh, legacyStats.ngoTinh);
-            stats.SetBase(StatId.CanCot, legacyStats.canCot);
-            stats.SetBase(StatId.CongVatLy, legacyStats.congVatLy);
-            stats.SetBase(StatId.CongPhapThuat, legacyStats.congPhapThuat);
-            stats.SetBase(StatId.PhongVatLy, legacyStats.phongVatLy);
-            stats.SetBase(StatId.PhongPhapThuat, legacyStats.phongPhapThuat);
-            stats.SetBase(StatId.ThanHon, legacyStats.thanHon);
-            stats.SetBase(StatId.TocDo, legacyStats.tocDo);
-            stats.SetBase(StatId.KhiVan, legacyStats.khiVan);
-            stats.SetBase(StatId.NghiepLuc, legacyStats.nghiepLuc);
-            stats.SetBase(StatId.InventorySize, legacyStats.InventorySize);
-            stats.SetBase(StatId.TiLeBaoKich, legacyStats.tiLeBaoKich);
-            stats.SetBase(StatId.SatThuongBaoKich, legacyStats.satThuongBaoKich);
-            stats.SetBase(StatId.HutMau, legacyStats.hutMau);
-            stats.SetBase(StatId.XuyenPhong, legacyStats.xuyenPhong);
-            stats.SetBase(StatId.HoiPhuc, legacyStats.hoiPhuc);
-            // Clear legacy so it won't be serialized again
-            legacyStats = null;
-            // Immediately save to upgrade file format
+            bool any =
+                legacyStats.khiHuyet_toida != 0 || legacyStats.khiHuyet != 0 ||
+                legacyStats.linhLuc_toida != 0 || legacyStats.linhLuc != 0 ||
+                legacyStats.thoNguyen_toida != 0 || legacyStats.thoNguyen != 0 ||
+                legacyStats.tuVi != 0 || legacyStats.daoHanh != 0 || legacyStats.daoTam != 0 ||
+                legacyStats.ngoTinh != 0 || legacyStats.canCot != 0 || legacyStats.congVatLy != 0 ||
+                legacyStats.congPhapThuat != 0 || legacyStats.phongVatLy != 0 || legacyStats.phongPhapThuat != 0 ||
+                legacyStats.thanHon != 0 || legacyStats.tocDo != 0 || legacyStats.khiVan != 0 || legacyStats.nghiepLuc != 0 ||
+                legacyStats.InventorySize != 0 || legacyStats.tiLeBaoKich != 0 || legacyStats.satThuongBaoKich != 0 ||
+                legacyStats.hutMau != 0 || legacyStats.xuyenPhong != 0 || legacyStats.hoiPhuc != 0;
+
+            if (any)
+            {
+                stats.SetBase(StatId.KhiHuyetMax, legacyStats.khiHuyet_toida);
+                stats.SetBase(StatId.KhiHuyet, legacyStats.khiHuyet);
+                stats.SetBase(StatId.LinhLucMax, legacyStats.linhLuc_toida);
+                stats.SetBase(StatId.LinhLuc, legacyStats.linhLuc);
+                stats.SetBase(StatId.ThoNguyenMax, legacyStats.thoNguyen_toida);
+                stats.SetBase(StatId.ThoNguyen, legacyStats.thoNguyen);
+                stats.SetBase(StatId.TuVi, legacyStats.tuVi);
+                stats.SetBase(StatId.DaoHanh, legacyStats.daoHanh);
+                stats.SetBase(StatId.DaoTam, legacyStats.daoTam);
+                stats.SetBase(StatId.NgoTinh, legacyStats.ngoTinh);
+                stats.SetBase(StatId.CanCot, legacyStats.canCot);
+                stats.SetBase(StatId.CongVatLy, legacyStats.congVatLy);
+                stats.SetBase(StatId.CongPhapThuat, legacyStats.congPhapThuat);
+                stats.SetBase(StatId.PhongVatLy, legacyStats.phongVatLy);
+                stats.SetBase(StatId.PhongPhapThuat, legacyStats.phongPhapThuat);
+                stats.SetBase(StatId.ThanHon, legacyStats.thanHon);
+                stats.SetBase(StatId.TocDo, legacyStats.tocDo);
+                stats.SetBase(StatId.KhiVan, legacyStats.khiVan);
+                stats.SetBase(StatId.NghiepLuc, legacyStats.nghiepLuc);
+                stats.SetBase(StatId.InventorySize, legacyStats.InventorySize);
+                stats.SetBase(StatId.TiLeBaoKich, legacyStats.tiLeBaoKich);
+                stats.SetBase(StatId.SatThuongBaoKich, legacyStats.satThuongBaoKich);
+                stats.SetBase(StatId.HutMau, legacyStats.hutMau);
+                stats.SetBase(StatId.XuyenPhong, legacyStats.xuyenPhong);
+                stats.SetBase(StatId.HoiPhuc, legacyStats.hoiPhuc);
+                Debug.Log("[PlayerData] Migrated legacy stats -> new StatCollection");
+            }
+            legacyStats = null; // luôn clear để không serialize lại
+            if (any) SaveForPlayer(id, true);
+        }
+
+        private void EnsureDefaultStatsIfUninitialized()
+        {
+            if (stats == null) return;
+            // Xác định 'chưa init' khi các core stat max đều 0 và level = 1
+            bool uninit =
+                Mathf.Approximately(stats.GetBase(StatId.KhiHuyetMax), 0) &&
+                Mathf.Approximately(stats.GetBase(StatId.LinhLucMax), 0) &&
+                Mathf.Approximately(stats.GetBase(StatId.ThoNguyenMax), 0);
+            if (!uninit) return;
+            stats.SetBase(StatId.KhiHuyetMax, 100);
+            stats.SetBase(StatId.KhiHuyet, 100);
+            stats.SetBase(StatId.LinhLucMax, 60);
+            stats.SetBase(StatId.LinhLuc, 60);
+            stats.SetBase(StatId.ThoNguyenMax, 30);
+            stats.SetBase(StatId.ThoNguyen, 30);
+            stats.SetBase(StatId.TocDo, Mathf.Max(1, stats.GetBase(StatId.TocDo))); // giữ giá trị nếu người chơi đã chỉnh >0
             SaveForPlayer(id, true);
+            Debug.Log("[PlayerData] Initialized default core stats (file had all zeros)");
         }
 
     }

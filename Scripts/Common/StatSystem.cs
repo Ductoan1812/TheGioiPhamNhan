@@ -212,7 +212,10 @@ namespace Xianxia.Stats
             var changed = new HashSet<StatId>();
             foreach (var kv in _modifiers)
             {
-                int removed = kv.Value.RemoveAll(m => m.source == source);
+                int removed = kv.Value.RemoveAll(m =>
+                    m.source == source ||
+                    (source is string s && m.source is string ms && string.Equals(s, ms, StringComparison.OrdinalIgnoreCase))
+                );
                 if (removed > 0) changed.Add(kv.Key);
             }
             foreach (var id in changed) RaiseFinalChanged(id);
