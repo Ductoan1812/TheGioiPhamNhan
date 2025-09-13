@@ -290,7 +290,6 @@ public class ItemCreator : EditorWindow
             rarity = Rarity.pham.ToString(),
             element = Element.none.ToString(),
             realmRequirement = Realm.PhamNhan.ToString(),
-            bindType = BindType.none.ToString(),
             level = 1,
             maxStack = 1,
             baseStats = new BaseStats { res = new Resist() },
@@ -396,9 +395,6 @@ public class ItemCreator : EditorWindow
         realm = (Realm)EditorGUILayout.EnumPopup("Cảnh giới yêu cầu", realm);
         dto.realmRequirement = realm.ToString();
 
-        var bind = ParseEnum(dto.bindType, BindType.none);
-        bind = (BindType)EditorGUILayout.EnumPopup("Ràng buộc", bind);
-        dto.bindType = bind.ToString();
 
     dto.level = EditorGUILayout.IntField("Cấp", dto.level);
     dto.maxStack = Mathf.Max(1, EditorGUILayout.IntField("Stack tối đa", dto.maxStack));

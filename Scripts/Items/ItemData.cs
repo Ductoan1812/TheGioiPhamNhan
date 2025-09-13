@@ -13,7 +13,6 @@ namespace Xianxia.Items
         public Rarity rarity;
         public Element element = Element.none;
         public Realm realmRequirement = Realm.PhamNhan;
-        public BindType bindType = BindType.none;
 
         public int level = 1;
         public int maxStack = 1;
@@ -40,7 +39,6 @@ namespace Xianxia.Items
                 $"Phẩm chất: {rarity}\n" +
                 $"Ngũ hành: {element}\n" +
                 $"Yêu cầu cảnh giới: {realmRequirement}\n" +
-                $"Ràng buộc: {bindType}\n" +
                 $"Cấp: {level}\n" +
                 $"Stack tối đa: {maxStack}\n" +
                 $"Chỉ số gốc: {baseStats}\n" +
@@ -77,7 +75,6 @@ namespace Xianxia.Items
         public string rarity;
         public string element;
         public string realmRequirement;
-        public string bindType;
 
     public int level = 1;
     public int maxStack = 1;
@@ -115,7 +112,6 @@ namespace Xianxia.Items
 
             Enum.TryParse(dto.element ?? "none", true, out Element element);
             Enum.TryParse(dto.realmRequirement ?? "none", true, out Realm realm);
-            Enum.TryParse(dto.bindType ?? "none", true, out BindType bind);
 
             data = new ItemData
             {
@@ -125,7 +121,6 @@ namespace Xianxia.Items
                 rarity = rarity,
                 element = element,
                 realmRequirement = realm,
-                bindType = bind,
                 level = dto.level,
                 maxStack = Mathf.Max(1, dto.maxStack),
                 baseStats = dto.baseStats ?? new BaseStats(),

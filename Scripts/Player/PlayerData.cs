@@ -3,185 +3,33 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using Xianxia.Items;
+using Xianxia.Stats;
 
 namespace Xianxia.PlayerDataSystem
 {
 
-    [Serializable]
-    public class PlayerStats
-    {
-        public int pors; // điểm tu luyện
-        public float hpMax; // máu tối đa
-        public float hp; // máu hiện tại
-        public float xpMax; // kinh nghiệm tối đa
-        public float xp; // kinh nghiệm hiện tại
-        public float qiMax; // mana tối đa
-        public float qi; // mana hiện tại
-        public float atk; // sát thương
-        public float def; // phòng thủ
-        public float critRate; // tỷ lệ chí mạng
-        public float critDmg; // sát thương chí mạng
-        public float moveSpd; // tốc độ di chuyển
-        public float hpRegen; // hồi phục máu
-        public float qiRegen; // hồi phục mana
-        public float lifesteal; // hút máu
-        public float spellPower; // sức mạnh phép thuật
-        public float spellResist; // kháng phép
-        public float dodge; // né tránh
-        public float pierce; // xuyên thấu
-        public float block; // chặn
-        public float blockRate; // tỷ lệ chặn
-        public float luck; // vận may   
-        public float InventorySize; // kích thước kho đồ
-    }
-    [Serializable]
-    public class InventoryItem : ItemData
-    {
-        public int Slot;
-        public int quantity;
-
-    }
-
-    [Serializable]
-    public class EquipmentData : ISerializationCallbackReceiver
-    {
-        public event Action<string, InventoryItem> OnEquipped;
-        public event Action<string, InventoryItem> OnUnequipped;
-        [Serializable]
-        public class Slot
-        {
-            public string idSlot;
-            public InventoryItem item; 
-        }
-
-        [SerializeField] private List<Slot> _slots = new List<Slot>();
-
-        [NonSerialized] private Dictionary<string, InventoryItem> _map;
-
-        public IReadOnlyList<Slot> Slots => _slots;
-
-        public bool Equip(string slotId, InventoryItem item, bool overwrite = true)
-        {
-            if (_map == null) BuildMap();
-            var slot = _slots.Find(s => s.idSlot == slotId);
-            if (slot == null) { slot = new Slot { idSlot = slotId, item = null }; _slots.Add(slot); }
-            if (!overwrite && slot.item != null) return false;
-
-            slot.item = item;
-            if (item == null) _map.Remove(slotId); else _map[slotId] = item;
-
-            OnEquipped?.Invoke(slotId, item); 
-            return true;
-        }
-
-        public InventoryItem Unequip(string slotId)
-        {
-            if (_map == null) BuildMap();
-            var slot = _slots.Find(s => s.idSlot == slotId);
-            if (slot == null || slot.item == null) return null;
-
-            var old = slot.item;
-            slot.item = null;
-            _map.Remove(slotId);
-
-            OnUnequipped?.Invoke(slotId, old); 
-            return old;
-        }
-
-        public bool TryGet(string slotId, out InventoryItem item)
-        {
-            if (_map == null) BuildMap();
-            return _map.TryGetValue(slotId, out item);
-        }
-
-        public void EnsureSlots(IEnumerable<string> slotIds)
-        {
-            bool changed = false;
-            foreach (var id in slotIds)
-            {
-                if (!_slots.Exists(s => s.idSlot == id))
-                {
-                    _slots.Add(new Slot { idSlot = id, item = null });
-                    changed = true;
-                }
-            }
-            if (changed) BuildMap();
-            else if (_map == null) BuildMap();
-        }
-
-        private void BuildMap()
-        {
-            _map = new Dictionary<string, InventoryItem>(StringComparer.OrdinalIgnoreCase);
-            foreach (var s in _slots)
-            {
-                if (!string.IsNullOrEmpty(s.idSlot))
-                    _map[s.idSlot] = s.item;
-            }
-        }
-
-        public void OnBeforeSerialize() { }
-        public void OnAfterDeserialize() { BuildMap(); }
-    }
-
-    [Serializable]
-    public class SkillData
-    {
-        public string id;
-        public int level;
-    }
-
-    [Serializable]
-    public class QuestData
-    {
-        public string id;
-        public string status; // completed / in_progress / failed
-    }
-
-    [Serializable]
-    public class CurrencyData
-    {
-        public int silver;
-        public int spirit_stone;
-    }
-
-    [Serializable]
-    public class SettingsData
-    {
-        public bool sound;
-        public float musicVolume;
-        public string lang;
-    }
-
-    [Serializable]
-    public class MetaData
-    {
-        public string lastLogin;
-        public int playTime; // giây
-    }
-
-    [Serializable]
-    public class PositionData
-    {
-        public string mapId;
-        public float x;
-        public float y;
-    }
+    // Các class phụ đã chuyển sang PlayerDataTypes.cs để gọn file.
 
     [Serializable]
     public class PlayerData
     {
-        public string id = "User_001123";
-        public string name = "Đức Toàn";
-        public int level = 1;
-        public string realm = "truc_co";
+        public string id = "User_001123"; 
+        public string name = ""; // tên hiển thị
+        public Realm realm = Realm.PhamNhan; // cảnh giới
+        public float bac = 0; // bạc
+        public float kim_ngan = 0; // kim ngân
+        public float nguyen_bao = 0; // nguyên bảo
         public int InventorySize = 30;
+    public int level = 1; // cấp độ nhân vật (cơ bản)
 
-        public PlayerStats stats = new PlayerStats();
+    // New extensible stats system
+    public StatCollection stats = new StatCollection();
+    // Legacy field for migrating older JSON (will be null for new saves)
+    [SerializeField] private PlayerStatsLegacy legacyStats;
         public EquipmentData equipment = new EquipmentData();
         public List<InventoryItem> inventory = new List<InventoryItem>();
         public List<SkillData> skills = new List<SkillData>();
         public List<QuestData> quests = new List<QuestData>();
-        public CurrencyData currency = new CurrencyData();
         public SettingsData settings = new SettingsData();
         public MetaData meta = new MetaData();
         public PositionData position = new PositionData();
@@ -251,6 +99,8 @@ namespace Xianxia.PlayerDataSystem
             string[] defaultSlots = { "weapon_l","weapon_r","armor","cloth","helmet","ring_r","ring_l","foot","body","pet","back" };
             data.equipment.EnsureSlots(defaultSlots);
 
+            // Migration from legacy stats if present
+            data.MigrateLegacyStatsIfNeeded();
             return data;
         }
 
@@ -285,5 +135,41 @@ namespace Xianxia.PlayerDataSystem
             string json = JsonUtility.ToJson(this, prettyPrint);
             File.WriteAllText(path, json);
         }
+
+        private void MigrateLegacyStatsIfNeeded()
+        {
+            if (legacyStats == null) return;
+            // Map legacy to new stat ids (base values)
+            stats.SetBase(StatId.KhiHuyetMax, legacyStats.khiHuyet_toida);
+            stats.SetBase(StatId.KhiHuyet, legacyStats.khiHuyet);
+            stats.SetBase(StatId.LinhLucMax, legacyStats.linhLuc_toida);
+            stats.SetBase(StatId.LinhLuc, legacyStats.linhLuc);
+            stats.SetBase(StatId.ThoNguyenMax, legacyStats.thoNguyen_toida);
+            stats.SetBase(StatId.ThoNguyen, legacyStats.thoNguyen);
+            stats.SetBase(StatId.TuVi, legacyStats.tuVi);
+            stats.SetBase(StatId.DaoHanh, legacyStats.daoHanh);
+            stats.SetBase(StatId.DaoTam, legacyStats.daoTam);
+            stats.SetBase(StatId.NgoTinh, legacyStats.ngoTinh);
+            stats.SetBase(StatId.CanCot, legacyStats.canCot);
+            stats.SetBase(StatId.CongVatLy, legacyStats.congVatLy);
+            stats.SetBase(StatId.CongPhapThuat, legacyStats.congPhapThuat);
+            stats.SetBase(StatId.PhongVatLy, legacyStats.phongVatLy);
+            stats.SetBase(StatId.PhongPhapThuat, legacyStats.phongPhapThuat);
+            stats.SetBase(StatId.ThanHon, legacyStats.thanHon);
+            stats.SetBase(StatId.TocDo, legacyStats.tocDo);
+            stats.SetBase(StatId.KhiVan, legacyStats.khiVan);
+            stats.SetBase(StatId.NghiepLuc, legacyStats.nghiepLuc);
+            stats.SetBase(StatId.InventorySize, legacyStats.InventorySize);
+            stats.SetBase(StatId.TiLeBaoKich, legacyStats.tiLeBaoKich);
+            stats.SetBase(StatId.SatThuongBaoKich, legacyStats.satThuongBaoKich);
+            stats.SetBase(StatId.HutMau, legacyStats.hutMau);
+            stats.SetBase(StatId.XuyenPhong, legacyStats.xuyenPhong);
+            stats.SetBase(StatId.HoiPhuc, legacyStats.hoiPhuc);
+            // Clear legacy so it won't be serialized again
+            legacyStats = null;
+            // Immediately save to upgrade file format
+            SaveForPlayer(id, true);
+        }
+
     }
 }

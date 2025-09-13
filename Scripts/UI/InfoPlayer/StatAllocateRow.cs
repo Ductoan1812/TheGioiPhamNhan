@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Xianxia.PlayerDataSystem;
+using Xianxia.Stats;
 
 namespace Xianxia.UI.InfoPlayer
 {
@@ -73,23 +74,11 @@ namespace Xianxia.UI.InfoPlayer
             RefreshDelta();
         }
 
-        public void RefreshValue(PlayerStats stats)
+        public void RefreshValue(StatCollection stats)
         {
             if (stats == null) return;
-            switch (statId)
-            {
-                case "hpMax":
-                    EnsureLabelHasColon();
-                    if (valueText) valueText.text = $"{Mathf.RoundToInt(stats.hp)}/{Mathf.RoundToInt(stats.hpMax)}"; break;
-                case "qiMax":
-                    EnsureLabelHasColon();
-                    if (valueText) valueText.text = $"{Mathf.RoundToInt(stats.qi)}/{Mathf.RoundToInt(stats.qiMax)}"; break;
-                default:
-                    float v = GetStatValue(stats, statId);
-                    EnsureLabelHasColon();
-                    if (valueText) valueText.text = v.ToString("0");
-                    break;
-            }
+            EnsureLabelHasColon();
+            if (valueText) valueText.text = Xianxia.UI.StatUiMapper.GetDisplayString(stats, statId);
             RefreshDelta();
         }
 
@@ -103,27 +92,7 @@ namespace Xianxia.UI.InfoPlayer
             }
         }
 
-        private float GetStatValue(PlayerStats s, string id)
-        {
-            return id switch
-            {
-                "atk" => s.atk,
-                "def" => s.def,
-                "hpMax" => s.hpMax,
-                "qiMax" => s.qiMax,
-                "critRate" => s.critRate,
-                "critDmg" => s.critDmg,
-                "moveSpd" => s.moveSpd,
-                "hpRegen" => s.hpRegen,
-                "qiRegen" => s.qiRegen,
-                "lifesteal" => s.lifesteal,
-                "spellPower" => s.spellPower,
-                "spellResist" => s.spellResist,
-                "dodge" => s.dodge,
-                "pierce" => s.pierce,
-                _ => 0f
-            };
-        }
+        // GetStatValue removed, logic unified in StatUiMapper
 
         private void RefreshDelta()
         {

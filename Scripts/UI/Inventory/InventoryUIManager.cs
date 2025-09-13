@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 #endif
 using System.Collections;
 using Xianxia.PlayerDataSystem;
+using Xianxia.Player;
 
 /// Quản lý logic kéo/thả giữa các SlotItem: gộp stack, hoán đổi, di chuyển.
 public class InventoryUIManager : MonoBehaviour
@@ -28,6 +29,12 @@ public class InventoryUIManager : MonoBehaviour
             if (PlayerManager.Instance.Data != null)
                 HandlePlayerDataLoaded(PlayerManager.Instance.Data);
         }
+    var service = InventoryService.Instance ?? InventoryService.EnsureInstance();
+        if (service != null)
+        {
+            service.OnInventoryChanged += HandleInventoryChanged;
+            service.OnEquipmentChanged += HandleEquipmentChanged;
+        }
     }
 
     public void RefreshFromCurrentData()
@@ -36,10 +43,30 @@ public class InventoryUIManager : MonoBehaviour
         RebuildFromData(data);
     }
 
+    private void HandleInventoryChanged(System.Collections.Generic.IReadOnlyList<InventoryItem> items)
+    {
+        var data = PlayerManager.Instance?.Data;
+        if (data == null) return;
+        data.inventory = items.ToList();
+        PopulateItems(data);
+    }
+
+    private void HandleEquipmentChanged(string slotId, InventoryItem newItem, InventoryItem oldItem)
+    {
+        // Equipment changes consume or return inventory items -> refresh inventory visuals.
+        RefreshFromCurrentData();
+    }
+
     private void OnDisable()
     {
         if (PlayerManager.Instance != null)
             PlayerManager.Instance.OnPlayerDataLoaded -= HandlePlayerDataLoaded;
+    var service = InventoryService.Instance ?? InventoryService.EnsureInstance();
+        if (service != null)
+        {
+            service.OnInventoryChanged -= HandleInventoryChanged;
+            service.OnEquipmentChanged -= HandleEquipmentChanged;
+        }
     }
 
     private void HandlePlayerDataLoaded(PlayerData data)
@@ -91,8 +118,9 @@ public class InventoryUIManager : MonoBehaviour
 
     private void PopulateItems(PlayerData data)
     {
-        if (data == null) return;
-        if (data.inventory == null) return;
+        // Clear all first to avoid ghost items
+        foreach (var s in slots) s.SetItem(null);
+        if (data == null || data.inventory == null) return;
         foreach (var it in data.inventory)
         {
             if (it == null) continue;
@@ -124,8 +152,17 @@ public class InventoryUIManager : MonoBehaviour
         }
         if (!string.IsNullOrEmpty(equipSlotName))
         {
-            // Chuyển sang luồng thống nhất: UnEquipItem(slot, targetIndex)
-            playerInventory?.UnEquipItem(equipSlotName, target.slotIndex);
+            var service = Xianxia.Player.InventoryService.Instance ?? FindFirstObjectByType<Xianxia.Player.InventoryService>();
+            if (service != null)
+            {
+                var res = service.UnEquipEx(equipSlotName);
+                if (res != Xianxia.Player.InventoryService.EquipResult.Success)
+                {
+                    Debug.LogWarning($"[InventoryUIManager] UnEquipEx {equipSlotName} failed: {res}");
+                }
+                // InventoryService tự thêm item vào inventory (tự chọn slot). Force refresh UI.
+                RefreshFromCurrentData();
+            }
             return;
         }
 

@@ -88,15 +88,47 @@ public class WordItem : MonoBehaviour
         }
         Debug.Log($"[WordItem] OnTriggerEnter2D by {other.name} (tag={other.tag})");
         if (playerTf == null) return false;
-        var inv = playerTf.GetComponentInChildren<PlayerInventory>();
-        if (inv == null) return false;
-        if (inv.AddItem(item))
+        var service = Xianxia.Player.InventoryService.Instance ?? FindFirstObjectByType<Xianxia.Player.InventoryService>();
+        if (service == null)
+        {
+            Debug.LogWarning("[WordItem] InventoryService not found");
+            return false;
+        }
+        // Clone item with desired quantity to avoid mutating prefab/reference
+        var pickupStack = new InventoryItem
+        {
+            id = item.id,
+            addressIcon = item.addressIcon,
+            addressTexture = item.addressTexture,
+            name = item.name,
+            category = item.category,
+            rarity = item.rarity,
+            element = item.element,
+            realmRequirement = item.realmRequirement,
+            level = item.level,
+            maxStack = item.maxStack,
+            baseStats = item.baseStats,
+            sockets = item.sockets,
+            affixes = item.affixes,
+            useEffect = item.useEffect,
+            flavor = item.flavor,
+            quantity = quantity > 0 ? quantity : 1,
+            Slot = -1
+        };
+        var (added, remainder) = service.AddItem(pickupStack);
+        if (added > 0 && remainder == 0)
         {
             Debug.Log($"[WordItem] Player nhặt '{item.id}' x{quantity}");
             Destroy(gameObject);
             return true;
         }
-        return false;
+        Debug.Log($"[WordItem] Inventory full, picked {added}, leftover {remainder}");
+        if (added > 0)
+        {
+            quantity = remainder; // update display to remaining if any (optional)
+            if (textMeshPro != null) textMeshPro.text = quantity.ToString();
+        }
+        return added > 0;
     }
     public async Task RenderItem()
     {

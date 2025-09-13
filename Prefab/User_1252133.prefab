@@ -390,7 +390,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: -15
-  m_Sprite: {fileID: 21300000, guid: b0038fe8d0b7b504696d2760e7f7289e, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -398,7 +398,7 @@ SpriteRenderer:
   m_Size: {x: 0.34375, y: 0.65625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1535370896055886315
@@ -479,7 +479,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 11
+  m_SortingOrder: -11
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -602,7 +602,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 19
-  m_Sprite: {fileID: 21300000, guid: b0038fe8d0b7b504696d2760e7f7289e, type: 3}
+  m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -610,7 +610,7 @@ SpriteRenderer:
   m_Size: {x: 0.21875, y: 0.5625}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &2168746797771618694
@@ -750,7 +750,15 @@ GameObject:
   - component: {fileID: 2630400050757849404}
   - component: {fileID: 4631249112011168342}
   - component: {fileID: 549007632193083638}
-  - component: {fileID: 3743945062660067440}
+  - component: {fileID: 5454226676619283292}
+  - component: {fileID: 3746864194116742409}
+  - component: {fileID: 4537350108234582923}
+  - component: {fileID: 6998094604903353848}
+  - component: {fileID: 3791666224768961052}
+  - component: {fileID: 3634983434524556759}
+  - component: {fileID: 8808718597232069653}
+  - component: {fileID: 6972831283249257873}
+  - component: {fileID: 5199570791616163490}
   m_Layer: 8
   m_Name: UnitRoot
   m_TagString: Player
@@ -882,7 +890,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &3743945062660067440
+--- !u!114 &5454226676619283292
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -891,18 +899,268 @@ MonoBehaviour:
   m_GameObject: {fileID: 2488282146937353282}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2510082370d7c4942863cde65289eb2c, type: 3}
+  m_Script: {fileID: 11500000, guid: c0557e466c959c142a555006e10debf4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Game.Runtime::PlayerStats
-  hp: 0
-  qi: 0
-  atk: 0
-  def: 0
-  critRate: 0
-  moveSpd: 0
+  m_EditorClassIdentifier: Assembly-CSharp::Xianxia.Player.PlayerEquitment
   onStatsLoaded:
     m_PersistentCalls:
       m_Calls: []
+  ItemDatabase: {fileID: 11400000, guid: e1dc69d3eb0c09a45a33bebcfa7218d7, type: 2}
+  playerRenderer: {fileID: 3746864194116742409}
+--- !u!114 &3746864194116742409
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29e83971938387d45b06b5e8309296ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Xianxia.Player.PlayerRenderer
+  weapon_r:
+  - renderers: {fileID: 3140259573758841986}
+    spriteNames: 
+    spriteIndexes: 0
+  weapon_l:
+  - renderers: {fileID: 7718015815163080252}
+    spriteNames: 
+    spriteIndexes: 0
+  armor:
+  - renderers: {fileID: 4930523091640460696}
+    spriteNames: Body
+    spriteIndexes: 0
+  - renderers: {fileID: 4351725664583273240}
+    spriteNames: Left
+    spriteIndexes: 1
+  - renderers: {fileID: 1471349722894252577}
+    spriteNames: Right
+    spriteIndexes: 2
+  cloth:
+  - renderers: {fileID: 7929892724935344125}
+    spriteNames: Body
+    spriteIndexes: 0
+  - renderers: {fileID: 8886346903849194165}
+    spriteNames: Left
+    spriteIndexes: 1
+  - renderers: {fileID: 2763602027045865930}
+    spriteNames: Right
+    spriteIndexes: 2
+  helmet:
+  - renderers: {fileID: 7869672105048113650}
+    spriteNames: 
+    spriteIndexes: 0
+  foot:
+  - renderers: {fileID: 6648015769349276116}
+    spriteNames: Right
+    spriteIndexes: 0
+  - renderers: {fileID: 2937037072479874798}
+    spriteNames: Left
+    spriteIndexes: 1
+  body:
+  - renderers: {fileID: 5936503899985170879}
+    spriteNames: Body
+    spriteIndexes: 2
+  - renderers: {fileID: 6654687790422611684}
+    spriteNames: Arm_L
+    spriteIndexes: 0
+  - renderers: {fileID: 5968599082415738922}
+    spriteNames: Arm_R
+    spriteIndexes: 1
+  - renderers: {fileID: 8546169145135773056}
+    spriteNames: Head
+    spriteIndexes: 5
+  - renderers: {fileID: 5655077240223641646}
+    spriteNames: Foot_R
+    spriteIndexes: 4
+  - renderers: {fileID: 2029685753773040417}
+    spriteNames: Foot_L
+    spriteIndexes: 3
+  pet: []
+  back:
+  - renderers: {fileID: 3504007693827698854}
+    spriteNames: 
+    spriteIndexes: 0
+--- !u!114 &4537350108234582923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24a00c2bdfd13fe4bac46591c1d3349b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
+--- !u!114 &6998094604903353848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61e7662f60ef92849af52528c2ee48f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerUI
+  hpFill: {fileID: 0}
+  manaFill: {fileID: 0}
+  expFill: {fileID: 0}
+  hpSlider: {fileID: 0}
+  manaSlider: {fileID: 0}
+  expSlider: {fileID: 0}
+  hpText: {fileID: 0}
+  manaText: {fileID: 0}
+  expPercentText: {fileID: 0}
+  levelText: {fileID: 0}
+--- !u!114 &3791666224768961052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f4e5764e63a7b44192071253323de84, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerInput
+--- !u!114 &3634983434524556759
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 546405684eae784408c0722e7e2eaf49, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerControler
+  moveSpeed: 6
+--- !u!114 &8808718597232069653
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e632aa546f51c54d9d97a69584ac676, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAnimation
+--- !u!114 &6972831283249257873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c663af109be992645bb6fe7b1a9799c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsManager
+  statsBaseData:
+    pors: 0
+    hpMax: 0
+    hp: 0
+    xpMax: 0
+    xp: 0
+    qiMax: 0
+    qi: 0
+    atk: 0
+    def: 0
+    critRate: 0
+    critDmg: 0
+    moveSpd: 0
+    hpRegen: 0
+    qiRegen: 0
+    lifesteal: 0
+    spellPower: 0
+    spellResist: 0
+    dodge: 0
+    pierce: 0
+    block: 0
+    blockRate: 0
+    luck: 0
+    InventorySize: 0
+  statsEquipData:
+    pors: 0
+    hpMax: 0
+    hp: 0
+    xpMax: 0
+    xp: 0
+    qiMax: 0
+    qi: 0
+    atk: 0
+    def: 0
+    critRate: 0
+    critDmg: 0
+    moveSpd: 0
+    hpRegen: 0
+    qiRegen: 0
+    lifesteal: 0
+    spellPower: 0
+    spellResist: 0
+    dodge: 0
+    pierce: 0
+    block: 0
+    blockRate: 0
+    luck: 0
+    InventorySize: 0
+  statsCurrentData:
+    pors: 0
+    hpMax: 0
+    hp: 0
+    xpMax: 0
+    xp: 0
+    qiMax: 0
+    qi: 0
+    atk: 0
+    def: 0
+    critRate: 0
+    critDmg: 0
+    moveSpd: 0
+    hpRegen: 0
+    qiRegen: 0
+    lifesteal: 0
+    spellPower: 0
+    spellResist: 0
+    dodge: 0
+    pierce: 0
+    block: 0
+    blockRate: 0
+    luck: 0
+    InventorySize: 0
+  onStatsRecalculated:
+    m_PersistentCalls:
+      m_Calls: []
+  levelSystem: {fileID: 0}
+--- !u!114 &5199570791616163490
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2488282146937353282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 74de4fb61417a8a41a956f8833106f91, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
+  attackRadius: 1.2
+  attackCooldown: 0.5
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  requireFacing: 0
+  facingDotThreshold: 0
+  showGizmo: 1
 --- !u!1 &2638640220167270945
 GameObject:
   m_ObjectHideFlags: 0
@@ -1842,7 +2100,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3179850812444727555}
-  - component: {fileID: 788193926177882836}
   m_Layer: 8
   m_Name: User_1252133
   m_TagString: Player
@@ -1866,19 +2123,6 @@ Transform:
   - {fileID: 8749337596197004127}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &788193926177882836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5246995953189068219}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f382f9be6b8e3de41bbd4cc1c58ab751, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
-  playerId: User_001
 --- !u!1 &5328305253795615618
 GameObject:
   m_ObjectHideFlags: 0

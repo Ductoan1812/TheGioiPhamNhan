@@ -15,7 +15,7 @@ namespace Xianxia.Player
         public ItemDatabaseSO ItemDatabase;
         public PlayerRenderer playerRenderer;
         private PlayerStatsManager statsManager;
-
+        private Xianxia.Stats.StatCollection stats; // tham chiếu StatCollection mới
 
         private EquipmentData Equipment;
 
@@ -43,15 +43,16 @@ namespace Xianxia.Player
         private void OnPlayerDataLoaded(PlayerData data)
         {
             Equipment = data?.equipment;
+            stats = data?.stats;
             statsManager = GetComponent<PlayerStatsManager>();
             if (Equipment != null)
             {
                 Equipment.OnEquipped += OnEquipmentChanged;
                 Equipment.OnUnequipped += OnEquipmentChanged;
             }
+            // Áp lại toàn bộ modifier từ trang bị hiện có (sau load)
+            ReapplyAllModifiers();
             ApplyToPlayerData();
-            statsManager?.RecalculateEquipmentStats(data);
-            statsManager?.RecalculateAll(data);
             onStatsLoaded?.Invoke();
             Debug.Log($"[PlayerEquitment] Loaded equipment for {data.id}");
             
@@ -59,9 +60,39 @@ namespace Xianxia.Player
         private void OnEquipmentChanged(string slotId, InventoryItem item)
         {
             var data = PlayerManager.Instance?.Data;
-            statsManager?.RecalculateEquipmentStats(data);
-            statsManager?.RecalculateAll(data);
+            // Cập nhật modifiers trong StatCollection
+            if (stats != null && !string.IsNullOrEmpty(slotId))
+            {
+                stats.RemoveModifiersBySource(slotId);
+                if (item != null && item.statBonuses != null)
+                {
+                    foreach (var b in item.statBonuses)
+                    {
+                        stats.AddModifier(b.id, b.add, b.pct, slotId);
+                    }
+                }
+            }
             RefreshSlotVisual(slotId, item);
+        }
+        private void ReapplyAllModifiers()
+        {
+            if (Equipment == null || stats == null) return;
+            // Clear all
+            foreach (var s in Equipment.Slots)
+            {
+                if (!string.IsNullOrEmpty(s.idSlot))
+                    stats.RemoveModifiersBySource(s.idSlot);
+            }
+            // Reapply
+            foreach (var s in Equipment.Slots)
+            {
+                var it = s.item;
+                if (it?.statBonuses == null) continue;
+                foreach (var b in it.statBonuses)
+                {
+                    stats.AddModifier(b.id, b.add, b.pct, s.idSlot);
+                }
+            }
         }
         // hàm gán trang bị lên nhân vật khi có trang bị thay đổi, 
         public void ApplyToPlayerData(bool save = true)

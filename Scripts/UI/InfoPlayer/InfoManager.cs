@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using Xianxia.PlayerDataSystem;
 using Xianxia.Items;
+using Xianxia.Stats;
 
 namespace Xianxia.UI.InfoPlayer
 {
@@ -12,6 +13,9 @@ namespace Xianxia.UI.InfoPlayer
 		[Header("Refs UI")]
 		[SerializeField] private TMP_Text playerNameText;
 		[SerializeField] private TMP_Text availablePointsText; // hiển thị điểm còn lại (pors hoặc điểm tạm)
+		[SerializeField] private TMP_Text levelText;            // hiển thị Level hiện tại
+		[SerializeField] private TMP_Text expText;              // hiển thị EXP: current / required (percent)
+		[SerializeField] private TMP_Text realmText;            // hiển thị Realm hiện tại
 		[SerializeField] private Button toggleAllocateButton;  // nút "Cộng điểm" bật/tắt chế độ phân phối
 		[SerializeField] private Button saveButton;
 		[SerializeField] private Button cancelButton;
@@ -55,6 +59,7 @@ namespace Xianxia.UI.InfoPlayer
 		private readonly List<StatAllocateRow> _rows = new List<StatAllocateRow>();
 		private PlayerStatsManager _statsManager;
 		private PlayerData _playerData;
+		private StatCollection _statCollection; // cached ref to data.stats
 		private readonly List<EquippedItemView> _equipViews = new List<EquippedItemView>();
 
 		private int _available;       // điểm thực tế có (pors)
@@ -63,8 +68,9 @@ namespace Xianxia.UI.InfoPlayer
 
 		private void Awake()
 		{
-			_statsManager = Object.FindFirstObjectByType<PlayerStatsManager>();
+			_statsManager = UnityEngine.Object.FindFirstObjectByType<PlayerStatsManager>();
 			_playerData = PlayerManager.Instance?.Data;
+			_statCollection = _playerData?.stats;
 			BuildRows();
 			BuildEquippedViews();
 			Hook();
@@ -78,6 +84,9 @@ namespace Xianxia.UI.InfoPlayer
 			{
 				PlayerManager.Instance.OnPlayerDataLoaded += OnPlayerDataLoaded;
 			}
+			// Subscribe level / stats events nếu có
+			if (_statsManager != null)
+				_statsManager.onStatsRecalculated.AddListener(OnStatsRecalculated);
 		}
 		private void OnDisable()
 		{
@@ -85,14 +94,26 @@ namespace Xianxia.UI.InfoPlayer
 			{
 				PlayerManager.Instance.OnPlayerDataLoaded -= OnPlayerDataLoaded;
 			}
+			if (_statsManager != null)
+				_statsManager.onStatsRecalculated.RemoveListener(OnStatsRecalculated);
 		}
 
 		private void OnPlayerDataLoaded(PlayerData data)
 		{
 			_playerData = data;
+			_statsManager = UnityEngine.Object.FindFirstObjectByType<PlayerStatsManager>();
+			_statCollection = _playerData?.stats;
 			RefreshAll();
 			RefreshEquippedItems();
+			RefreshRealm();
 		}
+
+		private void OnStatsRecalculated()
+		{
+			RefreshLevelExpSection();
+		}
+
+		// LevelUp no longer handled here (Tu Vi based progression)
 
 		private void Hook()
 		{
@@ -124,17 +145,51 @@ namespace Xianxia.UI.InfoPlayer
 
 		private void RefreshAll()
 		{
-			if (_playerData != null && playerNameText)
-				playerNameText.text = _playerData.name;
+			// Có thể Awake chạy trước khi PlayerManager khởi tạo / load data => cần guard null
+			if (_playerData == null || _playerData.stats == null)
+			{
+				_available = 0;
+				if (!_allocating) _tempRemaining = 0;
+				RefreshAvailablePointsUI();
+				_statCollection = null;
+				foreach (var r in _rows) r.RefreshValue(null);
+				UpdateButtonsState();
+				return; // Chờ OnPlayerDataLoaded gọi lại
+			}
 
-			_available = Mathf.Max(0, (int)(_playerData?.stats?.pors ?? 0));
-			if (!_allocating) _tempRemaining = _available; // cập nhật khi chưa trong mode phân phối
+			if (playerNameText) playerNameText.text = _playerData.name;
+
+			_available = Mathf.RoundToInt(_playerData.stats.GetBase(StatId.Points));
+			if (!_allocating) _tempRemaining = _available;
 			RefreshAvailablePointsUI();
 
-			var current = _statsManager != null ? GetCurrentStats() : _playerData?.stats;
-			foreach (var r in _rows) r.RefreshValue(current);
+			_statCollection = _playerData.stats;
+			foreach (var r in _rows) r.RefreshValue(_statCollection);
 			UpdateButtonsState();
 			RefreshEquippedItems();
+			RefreshLevelExpSection();
+			RefreshRealm();
+		}
+
+		private void RefreshLevelExpSection()
+		{
+			if (_playerData == null || _playerData.stats == null) return;
+			int level = _playerData.level;
+			float tuVi = _playerData.stats.GetFinal(StatId.TuVi);
+			float can = Mathf.Max(1f, _playerData.stats.GetFinal(StatId.TuViCan));
+			float pct = Mathf.Clamp01(tuVi / can);
+			if (levelText) levelText.text = $"Tầng {level}"; // hoặc đổi label nếu cần
+			if (expText) expText.text = $"Tu Vi: {tuVi:0}/{can:0} ({pct * 100f:0.0}%)";
+			RefreshRealm();
+		}
+
+		private void RefreshRealm()
+		{
+			if (realmText == null || _playerData == null) return;
+			var realmEnum = _playerData.realm;
+			var (label, color) = GetRealmDisplay(realmEnum);
+			realmText.text = label;
+			realmText.color = color;
 		}
 
 		// Public API để ép cập nhật lại dữ liệu mới nhất mỗi khi tab mở
@@ -142,7 +197,7 @@ namespace Xianxia.UI.InfoPlayer
 		{
 			// lấy lại tham chiếu data phòng trường hợp PlayerManager đổi instance
 			_playerData = PlayerManager.Instance?.Data;
-			_statsManager = Object.FindFirstObjectByType<PlayerStatsManager>();
+			_statsManager = UnityEngine.Object.FindFirstObjectByType<PlayerStatsManager>();
 			RefreshAll();
 			// Ép rebuild layout để Text / ContentSizeFitter cập nhật đúng kích thước khi panel vừa mở
 			ForceLayoutRebuild();
@@ -239,20 +294,17 @@ namespace Xianxia.UI.InfoPlayer
 			return item == null || string.IsNullOrEmpty(item.id);
 		}
 
-		private PlayerStats GetCurrentStats()
-		{
-			// Dùng reflection nhỏ để lấy field private nếu cần, ở đây giả sử có thể expose qua property hoặc serialized ref.
-			return PlayerManager.Instance?.Data?.stats;
-		}
+		// Removed GetCurrentStats (legacy PlayerStats)
 
 		private void RefreshAvailablePointsUI()
 		{
 			if (availablePointsText)
 			{
+				const string colorHex = "#FF3A3A"; // đỏ nhẹ dễ nhìn
 				if (_allocating)
-					availablePointsText.text = $"Điểm còn lại: {_tempRemaining}";
+					availablePointsText.text = $"Điểm còn lại: <color={colorHex}>{_tempRemaining}</color>";
 				else
-					availablePointsText.text = $"Điểm tu luyện: {_available}";
+					availablePointsText.text = $"Điểm tu luyện: <color={colorHex}>{_available}</color>";
 			}
 		}
 
@@ -293,7 +345,8 @@ namespace Xianxia.UI.InfoPlayer
 				ApplyStatIncrease(_playerData.stats, id, add);
 			}
 
-			_playerData.stats.pors = _tempRemaining; // cập nhật điểm còn lại
+			// Cập nhật lại số điểm còn lại về base Points
+			_playerData.stats.SetBase(StatId.Points, _tempRemaining);
 			// Recalc sau khi thay đổi cap (hpMax, qiMax ...)
 			_statsManager?.RecalculateAll(_playerData);
 			PlayerManager.Instance?.SavePlayer();
@@ -306,33 +359,45 @@ namespace Xianxia.UI.InfoPlayer
 			SetAllocateMode(false);
 		}
 
-		private void ApplyStatIncrease(PlayerStats stats, string id, int add)
+		private void ApplyStatIncrease(StatCollection stats, string id, int add)
 		{
 			if (stats == null || add <= 0) return;
-			switch (id)
-			{
-				case "hpMax": stats.hpMax += add; break;
-				case "qiMax": stats.qiMax += add; break;
-				case "atk": stats.atk += add; break;
-				case "def": stats.def += add; break;
-				case "critRate": stats.critRate += add * 0.5f; break; // ví dụ mỗi điểm +0.5%
-				case "critDmg": stats.critDmg += add * 1f; break;
-				case "moveSpd": stats.moveSpd += add * 0.2f; break;
-				case "hpRegen": stats.hpRegen += add; break;
-				case "qiRegen": stats.qiRegen += add; break;
-				case "lifesteal": stats.lifesteal += add * 0.5f; break;
-				case "spellPower": stats.spellPower += add; break;
-				case "spellResist": stats.spellResist += add; break;
-				case "dodge": stats.dodge += add * 0.3f; break;
-				case "pierce": stats.pierce += add; break;
-				default: break;
-			}
+			Xianxia.UI.StatUiMapper.AllocatePoints(stats, id, add);
 		}
 
 		private void UpdateButtonsState()
 		{
 			if (saveButton) saveButton.gameObject.SetActive(_allocating);
 			if (cancelButton) cancelButton.gameObject.SetActive(_allocating);
+		}
+
+		private (string label, Color color) GetRealmDisplay(Xianxia.Items.Realm realm)
+		{
+			switch (realm)
+			{
+				case Xianxia.Items.Realm.PhamNhan:
+					return ("Phàm nhân", Color.white);
+				case Xianxia.Items.Realm.luyen_khi:
+					return ("Luyện khí", new Color(0.65f, 0.90f, 1f)); // light cyan
+				case Xianxia.Items.Realm.truc_co:
+					return ("Trúc cơ", new Color(0.55f, 1f, 0.55f)); // greenish
+				case Xianxia.Items.Realm.kim_dan:
+					return ("Kim đan", new Color(1f, 0.85f, 0.35f)); // golden
+				case Xianxia.Items.Realm.nguyen_anh:
+					return ("Nguyên anh", new Color(1f, 0.55f, 0.35f)); // orange
+				case Xianxia.Items.Realm.hoa_than:
+					return ("Hóa thần", new Color(0.9f, 0.4f, 0.9f)); // purple
+				case Xianxia.Items.Realm.luyen_hu:
+					return ("Luyện hư", new Color(0.6f, 0.4f, 1f)); // violet
+				case Xianxia.Items.Realm.hop_the:
+					return ("Hợp thể", new Color(0.3f, 0.8f, 1f)); // azure
+				case Xianxia.Items.Realm.dai_thua:
+					return ("Đại thừa", new Color(1f, 0.3f, 0.3f)); // red
+				case Xianxia.Items.Realm.chuan_tien:
+					return ("Độ kiếp", new Color(1f, 1f, 0.6f)); // pale yellow
+				default:
+					return (realm.ToString(), Color.white);
+			}
 		}
 	}
 }

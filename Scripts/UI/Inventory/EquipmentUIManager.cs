@@ -4,6 +4,7 @@ using UnityEngine.Events;
 using Xianxia.PlayerDataSystem;
 using Xianxia.Items;
 using System.Collections;
+using Xianxia.Player;
 
 public class EquipmentUIManager : MonoBehaviour
 {
@@ -31,6 +32,13 @@ public class EquipmentUIManager : MonoBehaviour
         BuildMap();
         SubscribeSlotHandlers();
 
+        // Subscribe to service events for real-time updates
+    var service = InventoryService.Instance ?? InventoryService.EnsureInstance();
+        if (service != null)
+        {
+            service.OnEquipmentChanged += HandleEquipmentChanged;
+        }
+
         // Nếu dữ liệu đã có sẵn trước khi script này bật, refresh ngay
         if (PlayerManager.Instance != null && PlayerManager.Instance.Data != null)
         {
@@ -44,6 +52,12 @@ public class EquipmentUIManager : MonoBehaviour
             PlayerManager.Instance.OnPlayerDataLoaded -= OnPlayerDataLoaded;
 
         UnsubscribeSlotHandlers();
+
+    var service = InventoryService.Instance ?? InventoryService.EnsureInstance();
+        if (service != null)
+        {
+            service.OnEquipmentChanged -= HandleEquipmentChanged;
+        }
     }
 
     public void OnPlayerDataLoaded(PlayerData data)
@@ -154,9 +168,10 @@ public class EquipmentUIManager : MonoBehaviour
         }
         if (string.IsNullOrEmpty(toSlotId)) return;
 
-        if (PlayerInventory.Instance == null)
+    var service = InventoryService.Instance ?? InventoryService.EnsureInstance();
+        if (service == null)
         {
-            Debug.LogWarning("[EquipmentUIManager] PlayerInventory.Instance is null");
+            Debug.LogWarning("[EquipmentUIManager] InventoryService is null");
             return;
         }
 
@@ -169,15 +184,22 @@ public class EquipmentUIManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(fromSlotId))
         {
-            // Move between equipment slots without touching inventory
-            PlayerInventory.Instance.MoveEquipment(fromSlotId, toSlotId);
+            var res = service.MoveEquipmentEx(fromSlotId, toSlotId);
+            if (res != Xianxia.Player.InventoryService.EquipResult.Success)
+                Debug.LogWarning($"[EquipmentUIManager] MoveEquipmentEx {fromSlotId}->{toSlotId} failed: {res}");
+            else
+            {
+                // UI will update via event; nothing else needed
+            }
         }
         else
         {
             var item = source.CurrentItem;
             if (item == null || item.quantity <= 0) return;
-            // Source is inventory -> Equip (will remove 1 from inventory and handle old item return)
-            PlayerInventory.Instance.EquipItem(item, toSlotId);
+            var res = service.EquipEx(item, toSlotId);
+            if (res != Xianxia.Player.InventoryService.EquipResult.Success)
+                Debug.LogWarning($"[EquipmentUIManager] EquipEx {item.id} -> {toSlotId} failed: {res}");
+            // Success path: EquipmentChanged event will refresh UI
         }
     }
 
@@ -191,13 +213,16 @@ public class EquipmentUIManager : MonoBehaviour
             if (kv.Value.slotItem == slot) { slotId = kv.Key; break; }
         }
         if (string.IsNullOrEmpty(slotId)) return;
-        if (PlayerInventory.Instance == null)
+    var service = InventoryService.Instance ?? InventoryService.EnsureInstance();
+        if (service == null)
         {
-            Debug.LogWarning("[EquipmentUIManager] PlayerInventory.Instance is null");
+            Debug.LogWarning("[EquipmentUIManager] InventoryService is null");
             return;
         }
-        PlayerInventory.Instance.UnEquipItem(slotId);
-        UpdateSlotUI(slotId, null);
+        var res = service.UnEquipEx(slotId);
+        if (res != Xianxia.Player.InventoryService.EquipResult.Success)
+            Debug.LogWarning($"[EquipmentUIManager] UnEquipEx {slotId} failed: {res}");
+        // UI auto-updates via OnEquipmentChanged
     }
 
     private IEnumerator ShowEquipNextFrame()
@@ -222,6 +247,11 @@ public class EquipmentUIManager : MonoBehaviour
             return;
         }
         PlayerInventory.Instance.DropEquippedItem(slotId);
-        UpdateSlotUI(slotId, null);
+        // Equipment change event triggers UI clear
+    }
+
+    private void HandleEquipmentChanged(string slotId, InventoryItem newItem, InventoryItem oldItem)
+    {
+        UpdateSlotUI(slotId, newItem);
     }
 }
