@@ -15,18 +15,8 @@ MonoBehaviour:
   m_GroupName: Database
   m_GUID: 79159b46a37048f4f9c6d31542565e88
   m_SerializeEntries:
-  - m_GUID: 19406462ebd888c429a061859b15d13d
-    m_Address: Data/PlayerData.json
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: a9e891c0b48a6044ebc696fef438efb2
     m_Address: Prefabs/ItemPrefab.prefab
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: d2d0010dfd9ebb740a9a54b9cae05173
-    m_Address: Assets/Scripts/Items/Items.json
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
